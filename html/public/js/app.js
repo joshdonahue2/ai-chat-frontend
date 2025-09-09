@@ -47,30 +47,48 @@ class AIMemoryAgent {
     }
 
     cacheElements() {
-        const elementIds = [
-            'auth-container', 'app-container', 'loading-container',
-            'auth-form', 'auth-error', 'auth-title', 'full-name-group',
-            'full_name', 'email', 'password', 'auth-submit-button',
-            'auth-button-text', 'auth-toggle-link', 'user-display-name',
-            'logout-button', 'messages', 'messageInput', 'sendButton'
-        ];
+        // Fixed element mapping - using consistent naming
+        const elements = {
+            authContainer: document.getElementById('auth-container'),
+            appContainer: document.getElementById('app-container'),
+            loadingContainer: document.getElementById('loading-container'),
+            authForm: document.getElementById('auth-form'),
+            authError: document.getElementById('auth-error'),
+            authTitle: document.getElementById('auth-title'),
+            fullNameGroup: document.getElementById('full-name-group'),
+            fullName: document.getElementById('full_name'),
+            email: document.getElementById('email'),
+            password: document.getElementById('password'),
+            authSubmitButton: document.getElementById('auth-submit-button'),
+            authButtonText: document.getElementById('auth-button-text'),
+            authToggleLink: document.getElementById('auth-toggle-link'),
+            userDisplayName: document.getElementById('user-display-name'),
+            logoutButton: document.getElementById('logout-button'),
+            messages: document.getElementById('messages'),
+            messageInput: document.getElementById('messageInput'),
+            sendButton: document.getElementById('sendButton')
+        };
 
-        elementIds.forEach(id => {
-            const element = document.getElementById(id);
+        // Store elements and log missing ones
+        const missingElements = [];
+        Object.entries(elements).forEach(([key, element]) => {
+            this.elements[key] = element;
             if (!element) {
-                console.warn(`Element with id '${id}' not found`);
+                missingElements.push(key);
             }
-            this.elements[id.replace(/-/g, '')] = element;
         });
+
+        if (missingElements.length > 0) {
+            console.warn('Missing elements:', missingElements);
+        }
         
-        // Log which elements were found for debugging
-        console.log('Cached elements:', Object.keys(this.elements).filter(key => this.elements[key]));
+        console.log('Cached elements successfully');
     }
 
     bindEvents() {
         // Auth form
-        this.elements.authform?.addEventListener('submit', (e) => this.handleAuthSubmit(e));
-        this.elements.authtogglelink?.addEventListener('click', () => this.toggleAuthMode());
+        this.elements.authForm?.addEventListener('submit', (e) => this.handleAuthSubmit(e));
+        this.elements.authToggleLink?.addEventListener('click', () => this.toggleAuthMode());
 
         // Chat
         this.elements.sendButton?.addEventListener('click', () => this.sendMessage());
@@ -78,7 +96,7 @@ class AIMemoryAgent {
         this.elements.messageInput?.addEventListener('input', () => this.autoResizeInput());
 
         // Logout
-        this.elements.logoutbutton?.addEventListener('click', () => this.handleLogout());
+        this.elements.logoutButton?.addEventListener('click', () => this.handleLogout());
     }
 
     async initSupabase() {
@@ -102,6 +120,8 @@ class AIMemoryAgent {
                 } catch (error) {
                     console.error('Error during app initialization:', error);
                     this.showToast('Error loading app', 'error');
+                    // Fallback to show app anyway
+                    await this.initializeApp(session.user, null);
                 }
             } else {
                 console.log('No user session. Showing auth screen.');
@@ -119,20 +139,8 @@ class AIMemoryAgent {
             console.log('No initial session found.');
             this.showAuthScreen();
             this.hideLoading();
-        } else {
-            console.log('Initial session found for user:', session.user.id);
-            // Don't initialize here - let the auth state change handler do it
         }
-
-        // Fallback: if we're still on auth screen after 3 seconds but have a session, force transition
-        setTimeout(async () => {
-            const { data: { session: currentSession } } = await this.supabase.auth.getSession();
-            if (currentSession?.user && !this.elements.appcontainer?.classList.contains('show')) {
-                console.log('Fallback: Forcing app screen transition');
-                this.hideLoading();
-                this.showAppScreen();
-            }
-        }, 3000);
+        // If session exists, the auth state change handler will handle it
     }
 
     async fetchUserProfile(userId) {
@@ -167,7 +175,7 @@ class AIMemoryAgent {
         
         const email = this.elements.email?.value?.trim();
         const password = this.elements.password?.value;
-        const fullName = this.elements.fullname?.value?.trim();
+        const fullName = this.elements.fullName?.value?.trim();
 
         if (!email || !password) {
             this.showAuthError('Please fill in all required fields');
@@ -256,23 +264,23 @@ class AIMemoryAgent {
         this.clearAuthError();
 
         if (this.state.isSignUpMode) {
-            this.elements.authtitle.textContent = 'Sign Up';
-            this.elements.fullnamegroup.style.display = 'block';
-            this.elements.authbuttontext.textContent = 'Sign Up';
-            this.elements.authtogglelink.textContent = 'Already have an account? Sign In';
-            this.elements.fullname?.setAttribute('required', 'required');
+            this.elements.authTitle.textContent = 'Sign Up';
+            this.elements.fullNameGroup.style.display = 'block';
+            this.elements.authButtonText.textContent = 'Sign Up';
+            this.elements.authToggleLink.textContent = 'Already have an account? Sign In';
+            this.elements.fullName?.setAttribute('required', 'required');
         } else {
-            this.elements.authtitle.textContent = 'Sign In';
-            this.elements.fullnamegroup.style.display = 'none';
-            this.elements.authbuttontext.textContent = 'Sign In';
-            this.elements.authtogglelink.textContent = 'Need an account? Sign Up';
-            this.elements.fullname?.removeAttribute('required');
+            this.elements.authTitle.textContent = 'Sign In';
+            this.elements.fullNameGroup.style.display = 'none';
+            this.elements.authButtonText.textContent = 'Sign In';
+            this.elements.authToggleLink.textContent = 'Need an account? Sign Up';
+            this.elements.fullName?.removeAttribute('required');
         }
 
         // Focus appropriate field
         setTimeout(() => {
             if (this.state.isSignUpMode) {
-                this.elements.fullname?.focus();
+                this.elements.fullName?.focus();
             } else {
                 this.elements.email?.focus();
             }
@@ -289,12 +297,6 @@ class AIMemoryAgent {
         console.log('=== INITIALIZING APP ===');
         console.log('User:', user.id);
         console.log('Profile:', profile);
-        console.log('Elements check:', {
-            authcontainer: !!this.elements.authcontainer,
-            appcontainer: !!this.elements.appcontainer,
-            userdisplayname: !!this.elements.userdisplayname,
-            messages: !!this.elements.messages
-        });
 
         this.showLoading();
         this.state.userId = user.id;
@@ -303,11 +305,11 @@ class AIMemoryAgent {
         console.log('Display name:', displayName);
         
         // Update the display name
-        if (this.elements.userdisplayname) {
-            this.elements.userdisplayname.textContent = displayName;
+        if (this.elements.userDisplayName) {
+            this.elements.userDisplayName.textContent = displayName;
             console.log('Updated display name element');
         } else {
-            console.error('userdisplayname element not found!');
+            console.error('userDisplayName element not found!');
         }
 
         if (!this.state.isInitialized) {
@@ -323,9 +325,12 @@ class AIMemoryAgent {
         }
         
         console.log('About to hide loading and show app screen...');
-        this.hideLoading();
-        this.showAppScreen();
-        console.log('=== APP INITIALIZATION COMPLETE ===');
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+            this.hideLoading();
+            this.showAppScreen();
+            console.log('=== APP INITIALIZATION COMPLETE ===');
+        }, 100);
     }
 
     getDisplayName(user, profile) {
@@ -466,37 +471,70 @@ class AIMemoryAgent {
         input.style.height = Math.min(input.scrollHeight, 120) + 'px';
     }
 
-    // UI State Management
+    // UI State Management - FIXED METHODS
     showLoading() {
         console.log('Showing loading screen');
-        this.elements.loadingcontainer?.classList.add('show');
+        if (this.elements.loadingContainer) {
+            this.elements.loadingContainer.classList.add('show');
+            console.log('Loading screen shown');
+        } else {
+            console.error('Loading container element not found');
+        }
     }
 
     hideLoading() {
         console.log('Hiding loading screen');
-        this.elements.loadingcontainer?.classList.remove('show');
+        if (this.elements.loadingContainer) {
+            this.elements.loadingContainer.classList.remove('show');
+            console.log('Loading screen hidden');
+        } else {
+            console.error('Loading container element not found');
+        }
     }
 
     showAuthScreen() {
         console.log('Showing auth screen');
-        if (this.elements.authcontainer) {
-            this.elements.authcontainer.classList.remove('hidden');
+        if (this.elements.authContainer) {
+            this.elements.authContainer.classList.remove('hidden');
+            this.elements.authContainer.style.display = 'block';
+            console.log('Auth screen shown');
+        } else {
+            console.error('Auth container element not found');
         }
-        if (this.elements.appcontainer) {
-            this.elements.appcontainer.classList.remove('show');
+        
+        if (this.elements.appContainer) {
+            this.elements.appContainer.classList.remove('show');
+            this.elements.appContainer.style.display = 'none';
         }
-        this.elements.email?.focus();
+        
+        // Focus email input after a short delay
+        setTimeout(() => {
+            this.elements.email?.focus();
+        }, 100);
     }
 
     showAppScreen() {
         console.log('Showing app screen');
-        if (this.elements.authcontainer) {
-            this.elements.authcontainer.classList.add('hidden');
+        if (this.elements.authContainer) {
+            this.elements.authContainer.classList.add('hidden');
+            this.elements.authContainer.style.display = 'none';
+            console.log('Auth screen hidden');
+        } else {
+            console.error('Auth container element not found');
         }
-        if (this.elements.appcontainer) {
-            this.elements.appcontainer.classList.add('show');
+        
+        if (this.elements.appContainer) {
+            this.elements.appContainer.classList.add('show');
+            this.elements.appContainer.style.display = 'flex';
+            console.log('App screen shown');
+        } else {
+            console.error('App container element not found');
         }
-        this.elements.messageInput?.focus();
+        
+        // Focus message input after a short delay
+        setTimeout(() => {
+            this.elements.messageInput?.focus();
+        }, 100);
     }
 
     setLoading(loading) {
@@ -511,38 +549,38 @@ class AIMemoryAgent {
     }
 
     setAuthLoading(loading) {
-        if (this.elements.authsubmitbutton) {
-            this.elements.authsubmitbutton.disabled = loading;
+        if (this.elements.authSubmitButton) {
+            this.elements.authSubmitButton.disabled = loading;
         }
         
-        if (this.elements.authbuttontext) {
-            this.elements.authbuttontext.textContent = loading 
+        if (this.elements.authButtonText) {
+            this.elements.authButtonText.textContent = loading 
                 ? (this.state.isSignUpMode ? 'Signing up...' : 'Signing in...') 
                 : (this.state.isSignUpMode ? 'Sign Up' : 'Sign In');
         }
     }
 
     showAuthError(message) {
-        if (this.elements.autherror) {
-            this.elements.autherror.textContent = message;
+        if (this.elements.authError) {
+            this.elements.authError.textContent = message;
         }
         
         // Add error styling to inputs
-        [this.elements.email, this.elements.password, this.elements.fullname]
+        [this.elements.email, this.elements.password, this.elements.fullName]
             .filter(Boolean)
             .forEach(input => input.classList.add('error'));
         
         // Remove error styling after a delay
         setTimeout(() => {
-            [this.elements.email, this.elements.password, this.elements.fullname]
+            [this.elements.email, this.elements.password, this.elements.fullName]
                 .filter(Boolean)
                 .forEach(input => input.classList.remove('error'));
         }, 3000);
     }
 
     clearAuthError() {
-        if (this.elements.autherror) {
-            this.elements.autherror.textContent = '';
+        if (this.elements.authError) {
+            this.elements.authError.textContent = '';
         }
     }
 
