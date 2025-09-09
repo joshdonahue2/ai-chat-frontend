@@ -1,6 +1,6 @@
 "use strict";
 
-// Enhanced App Class
+// Enhanced App Class with enhanced debugging
 class AIMemoryAgent {
     constructor() {
         this.config = {
@@ -47,42 +47,39 @@ class AIMemoryAgent {
     }
 
     cacheElements() {
-        // Fixed element mapping - using consistent naming
-        const elements = {
-            authContainer: document.getElementById('auth-container'),
-            appContainer: document.getElementById('app-container'),
-            loadingContainer: document.getElementById('loading-container'),
-            authForm: document.getElementById('auth-form'),
-            authError: document.getElementById('auth-error'),
-            authTitle: document.getElementById('auth-title'),
-            fullNameGroup: document.getElementById('full-name-group'),
-            fullName: document.getElementById('full_name'),
-            email: document.getElementById('email'),
-            password: document.getElementById('password'),
-            authSubmitButton: document.getElementById('auth-submit-button'),
-            authButtonText: document.getElementById('auth-button-text'),
-            authToggleLink: document.getElementById('auth-toggle-link'),
-            userDisplayName: document.getElementById('user-display-name'),
-            logoutButton: document.getElementById('logout-button'),
-            messages: document.getElementById('messages'),
-            messageInput: document.getElementById('messageInput'),
-            sendButton: document.getElementById('sendButton')
-        };
+        console.log('=== CACHING ELEMENTS ===');
+        // Direct element queries with debugging
+        this.elements.authContainer = document.getElementById('auth-container');
+        this.elements.appContainer = document.getElementById('app-container');
+        this.elements.loadingContainer = document.getElementById('loading-container');
+        this.elements.authForm = document.getElementById('auth-form');
+        this.elements.authError = document.getElementById('auth-error');
+        this.elements.authTitle = document.getElementById('auth-title');
+        this.elements.fullNameGroup = document.getElementById('full-name-group');
+        this.elements.fullName = document.getElementById('full_name');
+        this.elements.email = document.getElementById('email');
+        this.elements.password = document.getElementById('password');
+        this.elements.authSubmitButton = document.getElementById('auth-submit-button');
+        this.elements.authButtonText = document.getElementById('auth-button-text');
+        this.elements.authToggleLink = document.getElementById('auth-toggle-link');
+        this.elements.userDisplayName = document.getElementById('user-display-name');
+        this.elements.logoutButton = document.getElementById('logout-button');
+        this.elements.messages = document.getElementById('messages');
+        this.elements.messageInput = document.getElementById('messageInput');
+        this.elements.sendButton = document.getElementById('sendButton');
 
-        // Store elements and log missing ones
-        const missingElements = [];
-        Object.entries(elements).forEach(([key, element]) => {
-            this.elements[key] = element;
-            if (!element) {
-                missingElements.push(key);
-            }
+        // Debug logging
+        Object.entries(this.elements).forEach(([key, element]) => {
+            console.log(`${key}: ${element ? 'FOUND' : 'MISSING'}`);
         });
 
-        if (missingElements.length > 0) {
-            console.warn('Missing elements:', missingElements);
-        }
-        
-        console.log('Cached elements successfully');
+        // Log current states
+        console.log('Current element states:');
+        console.log('Auth container display:', this.elements.authContainer?.style.display);
+        console.log('App container display:', this.elements.appContainer?.style.display);
+        console.log('Auth container classes:', this.elements.authContainer?.className);
+        console.log('App container classes:', this.elements.appContainer?.className);
+        console.log('=== END CACHING ===');
     }
 
     bindEvents() {
@@ -97,6 +94,8 @@ class AIMemoryAgent {
 
         // Logout
         this.elements.logoutButton?.addEventListener('click', () => this.handleLogout());
+
+        console.log('Events bound successfully');
     }
 
     async initSupabase() {
@@ -110,37 +109,111 @@ class AIMemoryAgent {
 
         // Set up auth state listener first
         this.supabase.auth.onAuthStateChange(async (event, session) => {
-            console.log(`Auth state change event: ${event}`, session?.user?.id);
+            console.log(`=== AUTH STATE CHANGE ===`);
+            console.log(`Event: ${event}`);
+            console.log('User ID:', session?.user?.id);
             
             if (session?.user) {
-                console.log('User session found. Initializing app for user:', session.user.id);
+                console.log('🟢 User session found. Initializing app...');
                 try {
+                    // Force immediate screen transition for debugging
+                    console.log('🔄 Forcing screen transition...');
+                    this.forceShowAppScreen();
+                    
                     const profile = await this.fetchUserProfile(session.user.id);
                     await this.initializeApp(session.user, profile);
                 } catch (error) {
-                    console.error('Error during app initialization:', error);
+                    console.error('❌ Error during app initialization:', error);
                     this.showToast('Error loading app', 'error');
-                    // Fallback to show app anyway
-                    await this.initializeApp(session.user, null);
+                    // Still try to show the app screen
+                    this.forceShowAppScreen();
                 }
             } else {
-                console.log('No user session. Showing auth screen.');
-                this.showAuthScreen();
+                console.log('🔴 No user session. Showing auth screen.');
+                this.forceShowAuthScreen();
                 this.hideLoading();
                 this.state.userId = null;
                 this.state.isInitialized = false;
             }
+            console.log('=== END AUTH STATE CHANGE ===');
         });
 
-        // Then, check for the initial session
+        // Check for initial session
         console.log('Checking for initial session...');
         const { data: { session } } = await this.supabase.auth.getSession();
         if (!session) {
             console.log('No initial session found.');
-            this.showAuthScreen();
+            this.forceShowAuthScreen();
             this.hideLoading();
         }
-        // If session exists, the auth state change handler will handle it
+    }
+
+    // FORCE METHODS FOR DEBUGGING
+    forceShowAuthScreen() {
+        console.log('🔧 FORCE SHOWING AUTH SCREEN');
+        
+        // Remove all classes and set direct styles
+        if (this.elements.authContainer) {
+            this.elements.authContainer.style.display = 'block';
+            this.elements.authContainer.style.visibility = 'visible';
+            this.elements.authContainer.style.opacity = '1';
+            this.elements.authContainer.classList.remove('hidden');
+            console.log('✅ Auth container forced visible');
+        } else {
+            console.error('❌ Auth container not found!');
+        }
+        
+        if (this.elements.appContainer) {
+            this.elements.appContainer.style.display = 'none';
+            this.elements.appContainer.style.visibility = 'hidden';
+            this.elements.appContainer.classList.remove('show');
+            console.log('✅ App container forced hidden');
+        } else {
+            console.error('❌ App container not found!');
+        }
+
+        if (this.elements.loadingContainer) {
+            this.elements.loadingContainer.style.display = 'none';
+            this.elements.loadingContainer.classList.remove('show');
+            console.log('✅ Loading container hidden');
+        }
+    }
+
+    forceShowAppScreen() {
+        console.log('🔧 FORCE SHOWING APP SCREEN');
+        
+        // Remove all classes and set direct styles
+        if (this.elements.authContainer) {
+            this.elements.authContainer.style.display = 'none';
+            this.elements.authContainer.style.visibility = 'hidden';
+            this.elements.authContainer.classList.add('hidden');
+            console.log('✅ Auth container forced hidden');
+        } else {
+            console.error('❌ Auth container not found!');
+        }
+        
+        if (this.elements.appContainer) {
+            this.elements.appContainer.style.display = 'flex';
+            this.elements.appContainer.style.visibility = 'visible';
+            this.elements.appContainer.style.opacity = '1';
+            this.elements.appContainer.classList.add('show');
+            console.log('✅ App container forced visible');
+        } else {
+            console.error('❌ App container not found!');
+        }
+
+        if (this.elements.loadingContainer) {
+            this.elements.loadingContainer.style.display = 'none';
+            this.elements.loadingContainer.classList.remove('show');
+            console.log('✅ Loading container hidden');
+        }
+
+        // Log final states
+        console.log('Final element states:');
+        console.log('Auth container display:', this.elements.authContainer?.style.display);
+        console.log('App container display:', this.elements.appContainer?.style.display);
+        console.log('Auth container classes:', this.elements.authContainer?.className);
+        console.log('App container classes:', this.elements.appContainer?.className);
     }
 
     async fetchUserProfile(userId) {
@@ -152,7 +225,7 @@ class AIMemoryAgent {
                 .eq('id', userId)
                 .single();
             
-            if (error && status !== 406) { // 406 is "Not Acceptable", happens when no rows are found
+            if (error && status !== 406) {
                 console.error('Error fetching profile:', error);
                 return null;
             }
@@ -277,7 +350,6 @@ class AIMemoryAgent {
             this.elements.fullName?.removeAttribute('required');
         }
 
-        // Focus appropriate field
         setTimeout(() => {
             if (this.state.isSignUpMode) {
                 this.elements.fullName?.focus();
@@ -298,39 +370,28 @@ class AIMemoryAgent {
         console.log('User:', user.id);
         console.log('Profile:', profile);
 
-        this.showLoading();
         this.state.userId = user.id;
-
         const displayName = this.getDisplayName(user, profile);
-        console.log('Display name:', displayName);
         
-        // Update the display name
         if (this.elements.userDisplayName) {
             this.elements.userDisplayName.textContent = displayName;
-            console.log('Updated display name element');
+            console.log('✅ Updated display name element');
         } else {
-            console.error('userDisplayName element not found!');
+            console.error('❌ userDisplayName element not found!');
         }
 
         if (!this.state.isInitialized) {
-            console.log('Performing first-time initialization of app UI.');
             if (this.elements.messages) {
                 this.elements.messages.innerHTML = '';
                 this.addMessage('assistant', `👋 Hello ${displayName}! I'm your AI assistant with long-term memory. What can I help you with today?`);
-                console.log('Added welcome message');
+                console.log('✅ Added welcome message');
             } else {
-                console.error('messages element not found!');
+                console.error('❌ messages element not found!');
             }
             this.state.isInitialized = true;
         }
         
-        console.log('About to hide loading and show app screen...');
-        // Small delay to ensure DOM is ready
-        setTimeout(() => {
-            this.hideLoading();
-            this.showAppScreen();
-            console.log('=== APP INITIALIZATION COMPLETE ===');
-        }, 100);
+        console.log('=== APP INITIALIZATION COMPLETE ===');
     }
 
     getDisplayName(user, profile) {
@@ -355,12 +416,10 @@ class AIMemoryAgent {
             return;
         }
 
-        // Clear input and add user message
         this.elements.messageInput.value = '';
         this.autoResizeInput();
         this.addMessage('user', message);
         
-        // Set loading state
         this.setLoading(true);
         const loadingMessage = this.addMessage('assistant', 'Thinking...', true);
 
@@ -375,7 +434,7 @@ class AIMemoryAgent {
                     message,
                     user_id: this.state.userId,
                     conversation_id: this.state.conversationId,
-                    conversation_history: this.state.conversationHistory.slice(-10) // Keep last 10 messages
+                    conversation_history: this.state.conversationHistory.slice(-10)
                 })
             });
 
@@ -386,20 +445,17 @@ class AIMemoryAgent {
             const data = await response.json();
             const responseText = data.response || 'Sorry, I received an empty response.';
             
-            // Update the loading message with the final response
             const contentDiv = loadingMessage.querySelector('.message-content');
             if (contentDiv) {
                 contentDiv.textContent = responseText;
                 contentDiv.classList.remove('loading');
             }
             
-            // Update conversation history
             this.state.conversationHistory.push(
                 { role: 'user', content: message },
                 { role: 'assistant', content: responseText }
             );
 
-            // Keep conversation history manageable
             if (this.state.conversationHistory.length > 20) {
                 this.state.conversationHistory = this.state.conversationHistory.slice(-20);
             }
@@ -408,7 +464,6 @@ class AIMemoryAgent {
             console.error('Send message error:', error);
             const errorText = `Sorry, I encountered an error: ${error.message}`;
 
-            // Update the loading message with the error
             const contentDiv = loadingMessage.querySelector('.message-content');
             if (contentDiv) {
                 contentDiv.textContent = errorText;
@@ -443,7 +498,6 @@ class AIMemoryAgent {
         messageDiv.appendChild(contentDiv);
         this.elements.messages.appendChild(messageDiv);
         
-        // Smooth scroll to bottom
         requestAnimationFrame(() => {
             this.elements.messages.scrollTop = this.elements.messages.scrollHeight;
         });
@@ -454,7 +508,6 @@ class AIMemoryAgent {
     handleMessageInputKeydown(e) {
         if (e.key === 'Enter') {
             if (e.shiftKey) {
-                // Allow new line
                 return;
             } else {
                 e.preventDefault();
@@ -471,70 +524,31 @@ class AIMemoryAgent {
         input.style.height = Math.min(input.scrollHeight, 120) + 'px';
     }
 
-    // UI State Management - FIXED METHODS
+    // Simplified UI State Management
     showLoading() {
         console.log('Showing loading screen');
         if (this.elements.loadingContainer) {
+            this.elements.loadingContainer.style.display = 'flex';
             this.elements.loadingContainer.classList.add('show');
-            console.log('Loading screen shown');
-        } else {
-            console.error('Loading container element not found');
         }
     }
 
     hideLoading() {
         console.log('Hiding loading screen');
         if (this.elements.loadingContainer) {
+            this.elements.loadingContainer.style.display = 'none';
             this.elements.loadingContainer.classList.remove('show');
-            console.log('Loading screen hidden');
-        } else {
-            console.error('Loading container element not found');
         }
     }
 
     showAuthScreen() {
-        console.log('Showing auth screen');
-        if (this.elements.authContainer) {
-            this.elements.authContainer.classList.remove('hidden');
-            this.elements.authContainer.style.display = 'block';
-            console.log('Auth screen shown');
-        } else {
-            console.error('Auth container element not found');
-        }
-        
-        if (this.elements.appContainer) {
-            this.elements.appContainer.classList.remove('show');
-            this.elements.appContainer.style.display = 'none';
-        }
-        
-        // Focus email input after a short delay
-        setTimeout(() => {
-            this.elements.email?.focus();
-        }, 100);
+        console.log('⚠️  Using legacy showAuthScreen - use forceShowAuthScreen instead');
+        this.forceShowAuthScreen();
     }
 
     showAppScreen() {
-        console.log('Showing app screen');
-        if (this.elements.authContainer) {
-            this.elements.authContainer.classList.add('hidden');
-            this.elements.authContainer.style.display = 'none';
-            console.log('Auth screen hidden');
-        } else {
-            console.error('Auth container element not found');
-        }
-        
-        if (this.elements.appContainer) {
-            this.elements.appContainer.classList.add('show');
-            this.elements.appContainer.style.display = 'flex';
-            console.log('App screen shown');
-        } else {
-            console.error('App container element not found');
-        }
-        
-        // Focus message input after a short delay
-        setTimeout(() => {
-            this.elements.messageInput?.focus();
-        }, 100);
+        console.log('⚠️  Using legacy showAppScreen - use forceShowAppScreen instead');
+        this.forceShowAppScreen();
     }
 
     setLoading(loading) {
@@ -565,12 +579,10 @@ class AIMemoryAgent {
             this.elements.authError.textContent = message;
         }
         
-        // Add error styling to inputs
         [this.elements.email, this.elements.password, this.elements.fullName]
             .filter(Boolean)
             .forEach(input => input.classList.add('error'));
         
-        // Remove error styling after a delay
         setTimeout(() => {
             [this.elements.email, this.elements.password, this.elements.fullName]
                 .filter(Boolean)
@@ -592,12 +604,10 @@ class AIMemoryAgent {
         const container = document.getElementById('toast-container') || document.body;
         container.appendChild(toast);
         
-        // Show toast
         requestAnimationFrame(() => {
             toast.classList.add('show');
         });
         
-        // Hide and remove toast
         setTimeout(() => {
             toast.classList.remove('show');
             setTimeout(() => {
@@ -608,14 +618,12 @@ class AIMemoryAgent {
         }, 4000);
     }
 
-    // Utility Methods
     generateConversationId() {
         const timestamp = Date.now();
         const random = Math.random().toString(36).substr(2, 9);
         return `conv_${timestamp}_${random}`;
     }
 
-    // Error handling
     handleGlobalError(error) {
         console.error('Global error:', error);
         this.showToast('An unexpected error occurred', 'error');
@@ -631,7 +639,7 @@ window.addEventListener('unhandledrejection', (e) => {
     console.error('Unhandled promise rejection:', e.reason);
 });
 
-// Initialize app when script loads
+// Initialize app
 let app;
 
 async function initializeApp() {
@@ -651,7 +659,6 @@ async function initializeApp() {
     }
 }
 
-// Start the app
 initializeApp();
 
 if ('serviceWorker' in navigator) {
