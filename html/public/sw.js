@@ -87,8 +87,8 @@ self.addEventListener('fetch', event => {
         console.log('SW: Fetching from network:', event.request.url);
         return fetch(event.request).then(
           networkResponse => {
-            // Don't cache JavaScript files or error responses
-            if (!event.request.url.includes('.js') && networkResponse.ok) {
+            // Don't cache JavaScript files, non-GET requests, or error responses
+            if (event.request.method === 'GET' && !event.request.url.includes('.js') && networkResponse.ok) {
               return caches.open(CACHE_NAME).then(cache => {
                 cache.put(event.request, networkResponse.clone());
                 return networkResponse;
