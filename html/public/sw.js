@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ai-memory-agent-cache-v4'; // Incremented version
+const CACHE_NAME = 'ai-memory-agent-cache-v5'; // Incremented version
 const urlsToCache = [
   '/css/style.css',
   '/manifest.json',
@@ -10,21 +10,20 @@ const urlsToCache = [
 
 // Install the service worker and cache static assets
 self.addEventListener('install', event => {
-  console.log('SW: Installing version v4');
+  console.log('SW: Installing version v5');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('SW: Opened cache v4');
+        console.log('SW: Opened cache v5');
         return cache.addAll(urlsToCache);
       })
   );
-  // Force the new service worker to take control immediately
   self.skipWaiting();
 });
 
 // Activate event to clean up old caches
 self.addEventListener('activate', event => {
-  console.log('SW: Activating version v4');
+  console.log('SW: Activating version v5');
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -37,66 +36,42 @@ self.addEventListener('activate', event => {
         })
       );
     }).then(() => {
-      // Take control of all pages immediately
       return self.clients.claim();
     })
   );
 });
 
+// Fetch event handler
 self.addEventListener('fetch', event => {
-  // Never cache JavaScript files - always fetch from network
-  if (event.request.url.includes('/js/') || event.request.url.includes('.js')) {
-    console.log('SW: Bypassing cache for JS file:', event.request.url);
-    event.respondWith(
-      fetch(event.request)
-        .catch(() => {
-          console.log('SW: Network failed for JS file, no fallback');
-          return new Response('// Network error loading JS file', {
-            status: 503,
-            statusText: 'Service Unavailable',
-            headers: {'Content-Type': 'application/javascript'}
-          });
-        })
-    );
+  // Ignore non-GET requests (e.g., POST, PUT, DELETE)
+  if (event.request.method !== 'GET') {
+    console.log(`SW: Bypassing ${event.request.method} request: ${event.request.url}`);
+    // Let the browser handle the request normally
     return;
   }
 
-  // Use a network-first strategy for navigation requests (e.g., loading the page)
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request)
-        .catch(() => {
-          // If the network fails, try to serve the main page from the cache
-          return caches.match('/index.html');
-        })
-    );
-    return;
-  }
-
-  // Use a cache-first strategy for other requests (CSS, images, etc.)
+  // For GET requests, use a network-falling-back-to-cache strategy
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // If the request is in the cache, return it
-        if (response) {
-          console.log('SW: Serving from cache:', event.request.url);
-          return response;
-        }
-
-        // If the request is not in the cache, fetch it from the network
-        console.log('SW: Fetching from network:', event.request.url);
-        return fetch(event.request).then(
-          networkResponse => {
-            // Don't cache JavaScript files, non-GET requests, or error responses
-            if (event.request.method === 'GET' && !event.request.url.includes('.js') && networkResponse.ok) {
-              return caches.open(CACHE_NAME).then(cache => {
-                cache.put(event.request, networkResponse.clone());
-                return networkResponse;
-              });
-            }
-            return networkResponse;
+    // Try to fetch from the network first
+    fetch(event.request)
+      .then(networkResponse => {
+        // If the network request is successful, cache it and return it
+        return caches.open(CACHE_NAME).then(cache => {
+          // Only cache successful (ok) responses and not JS files
+          if (networkResponse.ok && !event.request.url.includes('.js')) {
+            console.log(`SW: Caching successful response for: ${event.request.url}`);
+            cache.put(event.request, networkResponse.clone());
           }
-        );
+          return networkResponse;
+        });
+      })
+      .catch(() => {
+        // If the network request fails, try to get it from the cache
+        console.log(`SW: Network failed. Trying cache for: ${event.request.url}`);
+        return caches.match(event.request).then(cachedResponse => {
+          // Return the cached response if it exists
+          return cachedResponse;
+        });
       })
   );
 });
