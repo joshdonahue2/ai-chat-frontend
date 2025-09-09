@@ -1,20 +1,21 @@
-const CACHE_NAME = 'ai-memory-agent-cache-v5'; // Incremented version
+const CACHE_NAME = 'ai-memory-agent-cache-v6'; // Incremented version
 const urlsToCache = [
+  '/',
+  '/index.html',
   '/css/style.css',
   '/manifest.json',
   '/icon-144.png',
   '/icon-192.png',
   '/icon-512.png'
-  // Removed '/js/app.js' from cache so it always loads fresh
 ];
 
 // Install the service worker and cache static assets
 self.addEventListener('install', event => {
-  console.log('SW: Installing version v5');
+  console.log('SW: Installing version v6');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('SW: Opened cache v5');
+        console.log('SW: Opened cache v6');
         return cache.addAll(urlsToCache);
       })
   );
@@ -23,7 +24,7 @@ self.addEventListener('install', event => {
 
 // Activate event to clean up old caches
 self.addEventListener('activate', event => {
-  console.log('SW: Activating version v5');
+  console.log('SW: Activating version v6');
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -36,6 +37,7 @@ self.addEventListener('activate', event => {
         })
       );
     }).then(() => {
+      console.log('SW: Claiming clients for version v6');
       return self.clients.claim();
     })
   );
@@ -43,34 +45,32 @@ self.addEventListener('activate', event => {
 
 // Fetch event handler
 self.addEventListener('fetch', event => {
-  // Ignore non-GET requests (e.g., POST, PUT, DELETE)
-  if (event.request.method !== 'GET') {
-    console.log(`SW: Bypassing ${event.request.method} request: ${event.request.url}`);
-    // Let the browser handle the request normally
+  const apiUrl = 'https://supabase.donahuenet.xyz';
+
+  // Ignore non-GET requests and all API calls to Supabase
+  if (event.request.method !== 'GET' || event.request.url.startsWith(apiUrl)) {
+    // Let the browser handle these requests normally.
     return;
   }
 
-  // For GET requests, use a network-falling-back-to-cache strategy
+  // For static assets, use a cache-first strategy.
   event.respondWith(
-    // Try to fetch from the network first
-    fetch(event.request)
-      .then(networkResponse => {
-        // If the network request is successful, cache it and return it
-        return caches.open(CACHE_NAME).then(cache => {
-          // Only cache successful (ok) responses and not JS files
-          if (networkResponse.ok && !event.request.url.includes('.js')) {
-            console.log(`SW: Caching successful response for: ${event.request.url}`);
-            cache.put(event.request, networkResponse.clone());
-          }
-          return networkResponse;
-        });
-      })
-      .catch(() => {
-        // If the network request fails, try to get it from the cache
-        console.log(`SW: Network failed. Trying cache for: ${event.request.url}`);
-        return caches.match(event.request).then(cachedResponse => {
-          // Return the cached response if it exists
+    caches.match(event.request)
+      .then(cachedResponse => {
+        // If the asset is in the cache, return it.
+        if (cachedResponse) {
           return cachedResponse;
+        }
+
+        // If the asset is not in the cache, fetch it from the network.
+        return fetch(event.request).then(networkResponse => {
+          // Cache the new asset and return it.
+          return caches.open(CACHE_NAME).then(cache => {
+            if (networkResponse.ok) {
+              cache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
+          });
         });
       })
   );
