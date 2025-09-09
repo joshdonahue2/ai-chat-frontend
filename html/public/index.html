@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Memory Agent</title>
+    <meta name="description" content="AI assistant with long-term memory capabilities">
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://supabase.donahuenet.xyz">
+    <link rel="preconnect" href="https://n8n.donahuenet.xyz">
+    
+    <!-- PWA manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4a90e2">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <!-- SUPABASE JS CLIENT -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- LOADING INDICATOR -->
+        <div id="loading-container" class="loading">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+
+        <!-- AUTHENTICATION VIEW -->
+        <div id="auth-container" class="auth-container">
+            <h2 id="auth-title" class="auth-title">Sign In</h2>
+            <form id="auth-form" class="auth-form">
+                <div id="full-name-group" class="form-group" style="display: none;">
+                    <label for="full_name" class="form-label">Full Name</label>
+                    <input type="text" id="full_name" class="form-input" placeholder="Enter your full name" autocomplete="name">
+                </div>
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" class="form-input" placeholder="Enter your email" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="Enter your password" required autocomplete="current-password" minlength="6">
+                </div>
+                <button type="submit" id="auth-submit-button" class="btn btn-primary">
+                    <span id="auth-button-text">Sign In</span>
+                </button>
+                <div id="auth-error" class="error-message" role="alert" aria-live="polite"></div>
+            </form>
+            <p id="auth-toggle-link" class="auth-toggle">Need an account? Sign Up</p>
+        </div>
+
+        <!-- MAIN CHAT APPLICATION VIEW -->
+        <div id="app-container" class="app-container">
+            <header class="header">
+                <div class="header-content">
+                    <div>
+                        <h1>🧠 AI Memory Agent</h1>
+                        <p class="user-info">Logged in as: <span id="user-display-name"></span></p>
+                    </div>
+                    <button id="logout-button" class="btn btn-outline">Logout</button>
+                </div>
+            </header>
+            
+            <main class="chat-container">
+                <div class="messages" id="messages" role="log" aria-live="polite" aria-label="Chat messages">
+                    <!-- Messages will be added here -->
+                </div>
+                <footer class="input-container">
+                    <div class="input-row">
+                        <div class="input-wrapper">
+                            <textarea 
+                                class="message-input" 
+                                id="messageInput" 
+                                placeholder="Type your message here..." 
+                                rows="1"
+                                aria-label="Message input"
+                                maxlength="4000"
+                            ></textarea>
+                        </div>
+                        <button class="send-button" id="sendButton" aria-label="Send message">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22,2 15,22 11,13 2,9"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                </footer>
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toast-container"></div>
+
+    <script src="js/app.js" defer></script>
+</body>
+</html>
