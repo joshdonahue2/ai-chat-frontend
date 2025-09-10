@@ -5,7 +5,9 @@ FROM nginx:1.25-alpine
 RUN apk add --no-cache curl
 
 # Copy your application files
-COPY ./html/public /usr/share/nginx/html
+COPY ./html /usr/share/nginx/html
+COPY build.sh /usr/share/nginx/
+RUN /usr/share/nginx/build.sh
 
 # Copy the main nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
