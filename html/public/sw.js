@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ai-memory-agent-cache-v8'; // Incremented version
+const CACHE_NAME = 'ai-memory-agent-cache-v9'; // Incremented version
 const urlsToCache = [
   '/',
   '/index.html',
@@ -9,10 +9,11 @@ const urlsToCache = [
   '/icon-512.png',
   '/js/app.js'
 ];
+const apiUrl = 'https://supabase.donahuenet.xyz';
 
 // Install and cache assets
 self.addEventListener('install', event => {
-  console.log('SW: Installing version v8 (Diagnostic)');
+  console.log('SW: Installing version v9 (Production)');
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(urlsToCache);
@@ -24,7 +25,7 @@ self.addEventListener('install', event => {
 
 // Activate and clean up old caches
 self.addEventListener('activate', event => {
-  console.log('SW: Activating version v8 (Diagnostic)');
+  console.log('SW: Activating version v9 (Production)');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
@@ -36,15 +37,49 @@ self.addEventListener('activate', event => {
         })
       );
     }).then(() => {
-      console.log('SW: Claiming clients for version v8');
+      console.log('SW: Claiming clients for version v9');
       return self.clients.claim();
     })
   );
 });
 
-// Fetch handler - DO NOTHING
+// Fetch handler
 self.addEventListener('fetch', event => {
-    // This diagnostic version of the SW does not intercept any fetch events.
-    // All requests will be handled by the browser as if there were no service worker fetch listener.
+  // Ignore non-GET requests and all API calls to Supabase
+  if (event.request.method !== 'GET' || event.request.url.startsWith(apiUrl)) {
+    return; // Let the browser handle it
+  }
+
+  // Strategy: Network falling back to cache for HTML navigation
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => {
+          // If network fails, try the cache
+          return caches.match(event.request).then(response => {
+            return response || caches.match('/index.html');
+          });
+        })
+    );
     return;
+  }
+  
+  // Strategy: Stale-while-revalidate for all other assets (CSS, JS, images)
+  event.respondWith(
+    caches.match(event.request)
+      .then(cachedResponse => {
+        // Fetch from network in the background to update the cache
+        const fetchPromise = fetch(event.request).then(networkResponse => {
+          if (networkResponse && networkResponse.ok) {
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, networkResponse.clone());
+            });
+          }
+          return networkResponse;
+        });
+
+        // Return cached response immediately if available, otherwise wait for fetch
+        return cachedResponse || fetchPromise;
+      })
+  );
 });

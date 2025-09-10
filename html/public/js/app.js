@@ -107,45 +107,53 @@ class AIMemoryAgent {
         const { createClient } = supabase;
         this.supabase = createClient(this.config.supabaseUrl, this.config.supabaseAnonKey);
 
-        // Set up auth state listener first
+        console.log('Checking for initial session...');
+        // First, get the current session to ensure the client is initialized and we have the auth token
+        const { data: { session } } = await this.supabase.auth.getSession();
+
+        // Handle the initial page load based on the session
+        if (session?.user) {
+            console.log('🟢 Initial session found. Initializing app UI...');
+            try {
+                this.forceShowAppScreen();
+                const profile = await this.fetchUserProfile(session.user.id);
+                await this.initializeApp(session.user, profile);
+            } catch (error) {
+                console.error('❌ Error during initial app initialization:', error);
+                this.showToast('Error loading app data', 'error');
+                this.forceShowAuthScreen(); // Fallback to auth screen on error
+            }
+        } else {
+            console.log('🔴 No initial session found. Showing auth screen.');
+            this.forceShowAuthScreen();
+            this.hideLoading();
+        }
+
+        // Now that the initial state is handled, listen for SUBSEQUENT changes
         this.supabase.auth.onAuthStateChange(async (event, session) => {
-            console.log(`=== AUTH STATE CHANGE ===`);
+            // This listener now primarily handles logins/logouts that happen *after* the page has loaded
+            console.log(`=== AUTH STATE CHANGE (post-init) ===`);
             console.log(`Event: ${event}`);
-            console.log('User ID:', session?.user?.id);
-            
-            if (session?.user) {
-                console.log('🟢 User session found. Initializing app...');
-                try {
-                    // Force immediate screen transition for debugging
-                    console.log('🔄 Forcing screen transition...');
-                    this.forceShowAppScreen();
-                    
-                    const profile = await this.fetchUserProfile(session.user.id);
-                    await this.initializeApp(session.user, profile);
-                } catch (error) {
-                    console.error('❌ Error during app initialization:', error);
-                    this.showToast('Error loading app', 'error');
-                    // Still try to show the app screen
-                    this.forceShowAppScreen();
-                }
-            } else {
-                console.log('🔴 No user session. Showing auth screen.');
+
+            if (event === 'SIGNED_IN') {
+                 // This case is for when a user logs in manually, not for the initial load.
+                 console.log('User signed in manually. Initializing app UI.');
+                 try {
+                     this.forceShowAppScreen();
+                     const profile = await this.fetchUserProfile(session.user.id);
+                     await this.initializeApp(session.user, profile);
+                 } catch (error) {
+                     console.error('❌ Error after sign-in:', error);
+                     this.showToast('Error loading app data', 'error');
+                 }
+            } else if (event === 'SIGNED_OUT') {
+                console.log('🔴 User signed out. Showing auth screen.');
                 this.forceShowAuthScreen();
                 this.hideLoading();
                 this.state.userId = null;
                 this.state.isInitialized = false;
             }
-            console.log('=== END AUTH STATE CHANGE ===');
         });
-
-        // Check for initial session
-        console.log('Checking for initial session...');
-        const { data: { session } } = await this.supabase.auth.getSession();
-        if (!session) {
-            console.log('No initial session found.');
-            this.forceShowAuthScreen();
-            this.hideLoading();
-        }
     }
 
     // FORCE METHODS FOR DEBUGGING
