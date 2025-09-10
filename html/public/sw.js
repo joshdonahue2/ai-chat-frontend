@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ai-memory-agent-cache-v6'; // Incremented version
+const CACHE_NAME = 'ai-memory-agent-cache-v7'; // Incremented version
 const urlsToCache = [
   '/',
   '/index.html',
@@ -6,72 +6,81 @@ const urlsToCache = [
   '/manifest.json',
   '/icon-144.png',
   '/icon-192.png',
-  '/icon-512.png'
+  '/icon-512.png',
+  '/js/app.js'
 ];
+const apiUrl = 'https://supabase.donahuenet.xyz';
 
-// Install the service worker and cache static assets
+// Install and cache assets
 self.addEventListener('install', event => {
-  console.log('SW: Installing version v6');
+  console.log('SW: Installing version v7');
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('SW: Opened cache v6');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(cache => {
+      console.log('SW: Opened cache v7');
+      return cache.addAll(urlsToCache);
+    }).then(() => {
+      self.skipWaiting();
+    })
   );
-  self.skipWaiting();
 });
 
-// Activate event to clean up old caches
+// Activate and clean up old caches
 self.addEventListener('activate', event => {
-  console.log('SW: Activating version v6');
-  const cacheWhitelist = [CACHE_NAME];
+  console.log('SW: Activating version v7');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
+          if (cacheName !== CACHE_NAME) {
             console.log('SW: Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     }).then(() => {
-      console.log('SW: Claiming clients for version v6');
+      console.log('SW: Claiming clients for version v7');
       return self.clients.claim();
     })
   );
 });
 
-// Fetch event handler
+// Fetch handler
 self.addEventListener('fetch', event => {
-  const apiUrl = 'https://supabase.donahuenet.xyz';
-
   // Ignore non-GET requests and all API calls to Supabase
   if (event.request.method !== 'GET' || event.request.url.startsWith(apiUrl)) {
-    // Let the browser handle these requests normally.
-    return;
+    return; // Let the browser handle it
   }
 
-  // For static assets, use a cache-first strategy.
+  // Strategy: Network falling back to cache for HTML navigation
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => {
+          // If network fails, try the cache
+          return caches.match(event.request).then(response => {
+            return response || caches.match('/index.html');
+          });
+        })
+    );
+    return;
+  }
+  
+  // Strategy: Stale-while-revalidate for all other assets (CSS, JS, images)
   event.respondWith(
     caches.match(event.request)
       .then(cachedResponse => {
-        // If the asset is in the cache, return it.
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-
-        // If the asset is not in the cache, fetch it from the network.
-        return fetch(event.request).then(networkResponse => {
-          // Cache the new asset and return it.
-          return caches.open(CACHE_NAME).then(cache => {
-            if (networkResponse.ok) {
+        // Fetch from network in the background to update the cache
+        const fetchPromise = fetch(event.request).then(networkResponse => {
+          if (networkResponse && networkResponse.ok) {
+            caches.open(CACHE_NAME).then(cache => {
               cache.put(event.request, networkResponse.clone());
-            }
-            return networkResponse;
-          });
+            });
+          }
+          return networkResponse;
         });
+
+        // Return cached response immediately if available, otherwise wait for fetch
+        return cachedResponse || fetchPromise;
       })
   );
 });
