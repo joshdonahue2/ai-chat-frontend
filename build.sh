@@ -3,10 +3,6 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
-# Install esbuild
-echo "Installing esbuild..."
-apk add --no-cache esbuild
-
 # Define source and destination directories
 SRC_DIR="/usr/share/nginx/html/src"
 DEST_DIR="/usr/share/nginx/html/public/js"

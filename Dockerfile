@@ -1,12 +1,15 @@
 # Simple Dockerfile that should work immediately
 FROM nginx:1.25-alpine
 
-# Install curl for health checks
-RUN apk add --no-cache curl
+# Install build tools and curl for health checks
+RUN apk add --no-cache esbuild curl
 
 # Copy your application files
 COPY ./html /usr/share/nginx/html
 COPY build.sh /usr/share/nginx/
+
+# Make the build script executable and run it
+RUN chmod +x /usr/share/nginx/build.sh
 RUN /usr/share/nginx/build.sh
 
 # Copy the main nginx configuration
