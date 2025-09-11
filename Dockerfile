@@ -1,16 +1,31 @@
-# Simple Dockerfile that should work immediately
-FROM nginx:1.25-alpine
+# Use a Node.js base image to get npm
+FROM node:18-alpine AS builder
 
-# Install build tools and curl for health checks
-RUN apk add --no-cache esbuild curl
+# Set the working directory
+WORKDIR /app
 
-# Copy your application files
-COPY ./html /usr/share/nginx/html
-COPY build.sh /usr/share/nginx/
+# Copy package.json and package-lock.json
+COPY html/package.json html/package-lock.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application files
+COPY ./html /app/html
+COPY build.sh /app/
 
 # Make the build script executable and run it
-RUN chmod +x /usr/share/nginx/build.sh
-RUN /usr/share/nginx/build.sh
+RUN chmod +x /app/build.sh
+RUN /app/build.sh
+
+# Use a new stage for the production environment
+FROM nginx:1.25-alpine
+
+# Install curl for health checks
+RUN apk add --no-cache curl
+
+# Copy the built application from the builder stage
+COPY --from=builder /app/html/public /usr/share/nginx/html
 
 # Copy the main nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf

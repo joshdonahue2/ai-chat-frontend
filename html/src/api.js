@@ -1,21 +1,21 @@
+import { createClient } from '@supabase/supabase-js';
 import { state } from './state.js';
 import { ui } from './ui.js';
 
 const config = {
-    supabaseUrl: 'https://supabase.donahuenet.xyz',
-    supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE',
-    webhookUrl: 'https://n8n.donahuenet.xyz/webhook/ai-chat'
+    supabaseUrl: process.env.SUPABASE_URL,
+    supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
+    webhookUrl: process.env.WEBHOOK_URL
 };
 
 let supabase;
 
 export const api = {
     async initializeSupabase() {
-        if (typeof window.supabase === 'undefined') {
-            throw new Error('Supabase library not loaded');
+        if (!config.supabaseUrl || !config.supabaseAnonKey) {
+            throw new Error('Supabase URL or anonymous key not provided');
         }
         console.log('Initializing Supabase...');
-        const { createClient } = window.supabase;
         supabase = createClient(config.supabaseUrl, config.supabaseAnonKey);
         return supabase;
     },
