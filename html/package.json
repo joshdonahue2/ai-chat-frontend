@@ -1,0 +1,15 @@
+{
+  "name": "ai-chat-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for the AI Chat application",
+  "main": "src/app.js",
+  "scripts": {
+    "build": "sh ../build.sh"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.8",
+    "esbuild": "^0.20.2"
+  }
+}
