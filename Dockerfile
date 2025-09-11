@@ -4,6 +4,16 @@ FROM node:18-alpine AS builder
 # Set the working directory
 WORKDIR /app
 
+# Accept build arguments for Supabase and Webhook URLs
+ARG SUPABASE_URL
+ARG SUPABASE_ANON_KEY
+ARG WEBHOOK_URL
+
+# Set environment variables from the build arguments
+ENV SUPABASE_URL=$SUPABASE_URL
+ENV SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
+ENV WEBHOOK_URL=$WEBHOOK_URL
+
 # Copy package.json and package-lock.json
 COPY html/package.json html/package-lock.json ./
 
