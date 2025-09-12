@@ -94,3 +94,12 @@ Here is an overview of the most important files and directories in this reposito
 │       └── ui.js         # Handles DOM manipulation
 └── nginx.conf            # Nginx configuration file
 ```
+
+## Further Documentation
+
+For more detailed information about specific aspects of this project, please refer to the following documents:
+
+- **[`agent.md`](./agent.md)**: A comprehensive guide for developers and AI agents, including the development workflow and project structure.
+- **[`tech_stack.md`](./tech_stack.md)**: A detailed list of the technologies, libraries, and frameworks used in this project.
+- **[`api_reference.md`](./api_reference.md)**: The API reference for the AI webhook and Supabase interactions.
+- **[`project_goals.md`](./project_goals.md)**: The high-level goals and objectives of the project.
