@@ -414,3 +414,29 @@ body {
         transform: scale(1.0);
     }
 }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: 0;
+        display: block;
+    }
+    .container {
+        height: 100vh;
+        border-radius: 0;
+        border: none;
+        max-width: 100%;
+    }
+    .header h1 {
+        font-size: 20px;
+    }
+    .messages {
+        padding: var(--spacing-md);
+    }
+    .message-content {
+        max-width: 85%;
+    }
+    .input-container {
+        padding: var(--spacing-sm);
+    }
+}
