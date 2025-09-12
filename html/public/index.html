@@ -1,107 +1,122 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Memory Agent</title>
-    <meta name="description" content="AI assistant with long-term memory capabilities">
-    
-    <!-- Preload critical resources -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link rel="preconnect" href="https://supabase.donahuenet.xyz">
-    <link rel="preconnect" href="https://n8n.donahuenet.xyz">
-    
-    <!-- PWA manifest -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#4a90e2">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-    <div class="container">
-        <!-- LOADING INDICATOR -->
-        <div id="loading-container" class="loading">
-            <div class="spinner"></div>
-            <p>Loading...</p>
-        </div>
+<html><head>
+<meta charset="utf-8"/>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700" onload="this.rel='stylesheet'" rel="stylesheet"/>
+<title>Stitch Design</title>
+<link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style type="text/tailwindcss">
+    :root {
+      --primary-500: #00aaff;
+      --secondary-500: #ff6600;
+      --glow-color: rgba(0, 170, 255, 0.7);
+      --secondary-glow-color: rgba(255, 102, 0, 0.7);
+    }
+    .glow {
+      box-shadow: 0 0 8px var(--glow-color), 0 0 15px var(--glow-color), 0 0 30px var(--glow-color);
+    }
+    .text-glow {
+      text-shadow: 0 0 8px var(--glow-color), 0 0 15px var(--glow-color);
+    }
+    .secondary-glow {
+      box-shadow: 0 0 8px var(--secondary-glow-color), 0 0 15px var(--secondary-glow-color), 0 0 30px var(--secondary-glow-color);
+    }
+    .neon-border {
+      border: 1px solid var(--primary-500);
+      box-shadow: 0 0 5px var(--glow-color), 0 0 10px var(--glow-color) inset;
+    }
+    .secondary-neon-border {
+      border: 1px solid var(--secondary-500);
+      box-shadow: 0 0 5px var(--secondary-glow-color), 0 0 10px var(--secondary-glow-color) inset;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#0a0f14]">
+<div class="relative flex size-full min-h-screen flex-col bg-[#0a0f14] dark justify-between group/design-root overflow-x-hidden" style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
+<div class="flex-grow">
+<div class="flex items-center bg-[#111827]/80 backdrop-blur-sm p-4 pb-2 justify-between sticky top-0 z-10 neon-border border-b">
+<div class="w-12"></div>
+<h2 class="text-white text-xl font-bold leading-tight tracking-[-0.015em] flex-1 text-center text-glow" style="--glow-color: rgba(255, 255, 255, 0.7);">CyberChat</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 bg-transparent text-white/80 hover:text-[var(--primary-500)] transition-colors duration-300 gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0">
+<span class="material-symbols-outlined text-3xl">
+              settings
+            </span>
+</button>
+</div>
+</div>
+<div class="p-4 space-y-6">
+<div class="flex items-end gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-10 h-10 shrink-0 border-2 border-[var(--primary-500)] glow" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDA9FePZbFkMj4PgQ0nrjM_lrAKGqP6wcZKbkH0QQb9YjNVHBV72cffnHwr_AvY53AMD3edoyA1gIBFLoODGQ5tACjNNzXvCZlEcocyseBCn-wwU5oo3YTEPjuUdUqwEoKtW93qEapm1AcwgFzdJIIEJxzITtKxc2N_VUvxsR8UmgsWx0RkkDbqEH7pLjLFnKUB_7wMq1rsJCjUIGMAg2uVy9jHEjldnFrsPP3rfwGXaJhbSZ8lGMBWRKO-MvYHjZEySX6fx5Psug");'></div>
+<div class="flex flex-1 flex-col gap-1.5 items-start">
+<p class="text-[#88a3b5] text-sm font-medium">AI Assistant</p>
+<div class="text-base font-normal leading-normal flex max-w-md rounded-xl p-3.5 bg-[#1f2937] text-white/90 neon-border">
+<p>Hello! How can I assist you today?</p>
+</div>
+</div>
+</div>
+<div class="flex items-end gap-3 justify-end">
+<div class="flex flex-1 flex-col gap-1.5 items-end">
+<p class="text-[#88a3b5] text-sm font-medium text-right">You</p>
+<div class="text-base font-normal leading-normal flex max-w-md rounded-xl px-4 py-3 bg-[var(--secondary-500)] text-white secondary-neon-border">
+<p>Hi! Can you help me with some coding questions?</p>
+</div>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-10 h-10 shrink-0" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDXteke2ybebVe0ravE70yvEJJOj6DOt34890S2-Z1UXqq7CqcDXiInBD-Gdb7mnM-erwQem9Alk3s7wTfNnmStmUV9yUFxTKBEp_KfCB9BxPpH67n_stiFJVGZn2lqJPlASYk048p7BusSwkPWmJ9xcLn50dQa_WAAQg25BsUY4QAPPM0xL4e7bjLqJ19xOEB-eNNmd4QN9nu_6RYynylv2xxZj7gatrnwoc4Q1w0n1Y0qufSoWafHV_2V-FEyjY8i2hg6VQDMTQ");'></div>
+</div>
+</div>
+</div>
+<div class="sticky bottom-0 bg-[#0a0f14]/80 backdrop-blur-sm pb-3 neon-border border-t">
+<div class="flex items-center px-4 py-3 gap-3 @container">
+<div class="flex-1 relative">
+<input class="form-input w-full min-w-0 resize-none overflow-hidden rounded-full text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)] focus:ring-offset-2 focus:ring-offset-[#0a0f14] bg-[#1f2937] h-12 placeholder:text-[#88a3b5]/70 px-6 pr-20 text-base font-normal leading-normal transition-all duration-300 neon-border" placeholder="Type your message..." value=""/>
+<div class="absolute inset-y-0 right-0 flex items-center pr-2">
+<button class="flex items-center justify-center p-2 text-[#88a3b5]/70 hover:text-white transition-colors duration-300">
+<span class="material-symbols-outlined">
+                attach_file
+              </span>
+</button>
+<button class="flex items-center justify-center w-9 h-9 rounded-full bg-[var(--primary-500)] text-white glow hover:bg-opacity-80 transition-all duration-300">
+<span class="material-symbols-outlined">
+                send
+              </span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex gap-2 bg-[#111827] mx-4 rounded-full p-1 shadow-lg neon-border">
+<a class="just flex flex-1 flex-col items-center justify-center gap-1 rounded-full text-white py-2 bg-[var(--primary-500)]/30 border border-transparent" href="#">
+<span class="material-symbols-outlined text-2xl text-glow" style="--glow-color: rgba(0, 170, 255, 0.9);">
+            chat_bubble
+          </span>
+<p class="text-white text-xs font-medium leading-normal tracking-[0.015em]">Chat</p>
+</a>
+<a class="just flex flex-1 flex-col items-center justify-center gap-1 text-[#88a3b5] rounded-full py-2 hover:bg-white/5 transition-colors duration-300" href="#">
+<span class="material-symbols-outlined text-2xl">
+            history
+          </span>
+<p class="text-[#88a3b5] text-xs font-medium leading-normal tracking-[0.015em]">History</p>
+</a>
+<a class="just flex flex-1 flex-col items-center justify-center gap-1 text-[#88a3b5] rounded-full py-2 hover:bg-white/5 transition-colors duration-300" href="#">
+<span class="material-symbols-outlined text-2xl">
+            person
+          </span>
+<p class="text-[#88a3b5] text-xs font-medium leading-normal tracking-[0.015em]">Profile</p>
+</a>
+</div>
+</div>
+</div>
 
-        <!-- AUTHENTICATION VIEW -->
-        <div id="auth-container" class="auth-container">
-            <h2 id="auth-title" class="auth-title">Sign In</h2>
-            <form id="auth-form" class="auth-form">
-                <div id="full-name-group" class="form-group" style="display: none;">
-                    <label for="full_name" class="form-label">Full Name</label>
-                    <input type="text" id="full_name" class="form-input" placeholder="Enter your full name" autocomplete="name">
-                </div>
-                <div class="form-group">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" id="email" class="form-input" placeholder="Enter your email" required autocomplete="email">
-                </div>
-                <div class="form-group">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" id="password" class="form-input" placeholder="Enter your password" required autocomplete="current-password" minlength="6">
-                </div>
-                <button type="submit" id="auth-submit-button" class="btn btn-primary">
-                    <span id="auth-button-text">Sign In</span>
-                </button>
-                <div id="auth-error" class="error-message" role="alert" aria-live="polite"></div>
-            </form>
-            <p id="auth-toggle-link" class="auth-toggle">Need an account? Sign Up</p>
-        </div>
-
-        <!-- MAIN CHAT APPLICATION VIEW -->
-        <div id="app-container" class="app-container">
-            <header class="header">
-                <div class="header-content">
-                    <div>
-                        <h1>🧠 AI Memory Agent</h1>
-                        <p class="user-info">Logged in as: <span id="user-display-name"></span></p>
-                    </div>
-                    <button id="logout-button" class="btn btn-outline">Logout</button>
-                </div>
-            </header>
-            
-            <main class="chat-container">
-                <div class="messages" id="messages" role="log" aria-live="polite" aria-label="Chat messages">
-                    <!-- Messages will be added here -->
-                    <div class="message assistant" id="thinking-indicator" style="display: none;">
-                        <div class="message-content">
-                            <div class="typing-indicator">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <footer class="input-container">
-                    <div class="input-row">
-                        <div class="input-wrapper">
-                            <textarea 
-                                class="message-input" 
-                                id="messageInput" 
-                                placeholder="Type your message here..." 
-                                rows="1"
-                                aria-label="Message input"
-                                maxlength="4000"
-                            ></textarea>
-                        </div>
-                        <button class="send-button" id="sendButton" aria-label="Send message">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <line x1="22" y1="2" x2="11" y2="13"></line>
-                                <polygon points="22,2 15,22 11,13 2,9"></polygon>
-                            </svg>
-                        </button>
-                    </div>
-                </footer>
-            </main>
-        </div>
-    </div>
-
-    <!-- Toast notifications -->
-    <div id="toast-container"></div>
-
-    <script type="module" src="js/bundle.js" defer></script>
-</body>
-</html>
+</body></html>
