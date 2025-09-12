@@ -1,11 +1,12 @@
 # AI Memory Agent
 
-This is the frontend for an AI chat application with long-term memory capabilities. The application provides a user-friendly interface for interacting with an AI assistant, and it is built to be easily deployed as a containerized service.
+This is the frontend for an AI chat application with long-term memory capabilities. The application has been redesigned with a modern "cyber" theme, providing a visually engaging interface for interacting with an AI assistant. It is built to be easily deployed as a containerized service.
 
 ## Features
 
+*   **Cyber Theme UI:** A new, modern user interface with a dark, "cyber" theme, complete with neon accents and custom icons.
 *   **User Authentication:** Secure sign-up and sign-in functionality using Supabase Auth.
-*   **Real-time Chat Interface:** A clean and responsive chat interface for communicating with the AI assistant.
+*   **Real-time Chat Interface:** A responsive chat interface with user and assistant avatars.
 *   **AI Assistant Integration:** Seamlessly connects to a webhook endpoint for processing and responding to user messages.
 *   **Long-term Memory:** The AI assistant can remember previous conversations, providing a more personalized experience.
 *   **Containerized Deployment:** The application is fully containerized using Docker and Docker Compose for easy setup and deployment.
