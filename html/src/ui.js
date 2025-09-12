@@ -90,7 +90,7 @@ export const ui = {
 
         const avatar = document.createElement('img');
         avatar.className = 'avatar';
-        avatar.src = sender === 'user' ? 'public/user-avatar.png' : 'public/assistant-avatar.png';
+        avatar.src = sender === 'user' ? 'user-avatar.png' : 'assistant-avatar.png';
         avatar.alt = sender;
         messageDiv.appendChild(avatar);
 
