@@ -27,6 +27,9 @@ export const ui = {
         this.elements.navChat = document.getElementById('nav-chat');
         this.elements.navHistory = document.getElementById('nav-history');
         this.elements.navProfile = document.getElementById('nav-profile');
+        this.elements.settingsContainer = document.getElementById('settings-container');
+        this.elements.backButton = document.getElementById('back-button');
+        this.elements.logoutButton = document.getElementById('logout-button');
 
         Object.entries(this.elements).forEach(([key, element]) => {
             console.log(`${key}: ${element ? 'FOUND' : 'MISSING'}`);
@@ -59,6 +62,24 @@ export const ui = {
         }
         if (this.elements.loadingContainer) {
             this.elements.loadingContainer.style.display = 'none';
+        }
+    },
+
+    showSettingsPage() {
+        if (this.elements.appContainer) {
+            this.elements.appContainer.style.display = 'none';
+        }
+        if (this.elements.settingsContainer) {
+            this.elements.settingsContainer.style.display = 'flex';
+        }
+    },
+
+    hideSettingsPage() {
+        if (this.elements.settingsContainer) {
+            this.elements.settingsContainer.style.display = 'none';
+        }
+        if (this.elements.appContainer) {
+            this.elements.appContainer.style.display = 'flex';
         }
     },
 

@@ -337,3 +337,46 @@ body {
 .app-container.show {
     display: flex;
 }
+
+/* Settings View */
+.settings-container {
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background-color: var(--background-color);
+    color: var(--text-primary);
+}
+
+.settings-container.show {
+    display: flex;
+}
+
+.settings-content {
+    flex-grow: 1;
+    padding: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-danger {
+    background-color: var(--error-color);
+    color: white;
+    border: 1px solid var(--error-color);
+    padding: 12px 24px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    width: 100%;
+    max-width: 240px;
+    text-align: center;
+    transition: var(--transition);
+}
+
+.btn-danger:hover {
+    opacity: 0.9;
+    box-shadow: 0 0 10px var(--error-color);
+}
