@@ -11,7 +11,7 @@ export async function initializeApp(user, profile) {
     if (!user) return;
     state.userId = user.id;
     const displayName = getDisplayName(user, profile);
-    ui.elements.userDisplayName.textContent = displayName;
+    // ui.elements.userDisplayName.textContent = displayName;
 
     if (!state.isInitialized) {
         if (ui.elements.messages) {
@@ -63,7 +63,14 @@ function bindEvents() {
     ui.elements.sendButton?.addEventListener('click', () => handleMessageSend());
     ui.elements.messageInput?.addEventListener('keydown', (e) => handleMessageInputKeydown(e));
     ui.elements.messageInput?.addEventListener('input', () => ui.autoResizeInput());
-    ui.elements.logoutButton?.addEventListener('click', () => auth.handleLogout());
+    // ui.elements.logoutButton?.addEventListener('click', () => auth.handleLogout());
+
+    ui.elements.settingsButton?.addEventListener('click', () => console.log('Settings button clicked'));
+    ui.elements.micButton?.addEventListener('click', () => console.log('Mic button clicked'));
+    ui.elements.navChat?.addEventListener('click', () => console.log('Nav chat clicked'));
+    ui.elements.navHistory?.addEventListener('click', () => console.log('Nav history clicked'));
+    ui.elements.navProfile?.addEventListener('click', () => console.log('Nav profile clicked'));
+
     console.log('Events bound successfully');
 }
 

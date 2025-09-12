@@ -18,12 +18,15 @@ export const ui = {
         this.elements.authSubmitButton = document.getElementById('auth-submit-button');
         this.elements.authButtonText = document.getElementById('auth-button-text');
         this.elements.authToggleLink = document.getElementById('auth-toggle-link');
-        this.elements.userDisplayName = document.getElementById('user-display-name');
-        this.elements.logoutButton = document.getElementById('logout-button');
+        this.elements.settingsButton = document.getElementById('settings-button');
+        this.elements.micButton = document.getElementById('mic-button');
         this.elements.messages = document.getElementById('messages');
         this.elements.messageInput = document.getElementById('messageInput');
         this.elements.sendButton = document.getElementById('sendButton');
         this.elements.thinkingIndicator = document.getElementById('thinking-indicator');
+        this.elements.navChat = document.getElementById('nav-chat');
+        this.elements.navHistory = document.getElementById('nav-history');
+        this.elements.navProfile = document.getElementById('nav-profile');
 
         Object.entries(this.elements).forEach(([key, element]) => {
             console.log(`${key}: ${element ? 'FOUND' : 'MISSING'}`);
@@ -63,10 +66,18 @@ export const ui = {
         if (!this.elements.messages) return;
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${sender}`;
+
+        const avatar = document.createElement('img');
+        avatar.className = 'avatar';
+        avatar.src = sender === 'user' ? 'public/user-avatar.png' : 'public/assistant-avatar.png';
+        avatar.alt = sender;
+        messageDiv.appendChild(avatar);
+
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
         contentDiv.textContent = content;
         messageDiv.appendChild(contentDiv);
+
         this.elements.messages.insertBefore(messageDiv, this.elements.thinkingIndicator);
         this.elements.messages.scrollTop = this.elements.messages.scrollHeight;
     },

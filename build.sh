@@ -8,7 +8,7 @@ SRC_DIR="/app/html/src"
 DEST_DIR="/app/html/public/js"
 DEST_FILE="$DEST_DIR/bundle.js"
 ENTRY_POINT="$SRC_DIR/app.js"
-ESBUILD_PATH="/app/node_modules/.bin/esbuild"
+ESBUILD_PATH="/app/html/node_modules/.bin/esbuild"
 
 # Create destination directory if it doesn't exist
 mkdir -p "$DEST_DIR"

@@ -8,7 +8,7 @@ This document outlines the high-level goals for the AI Chat Agent project.
   - Include user authentication (sign-up, sign-in, sign-out) using Supabase.
 
 - **User Experience**:
-  - Design an intuitive, responsive, and visually appealing user interface that works well on both desktop and mobile devices.
+  - Design an intuitive, responsive, and visually appealing user interface with a "cyber" theme that works well on both desktop and mobile devices.
   - Provide clear feedback to the user, such as loading indicators and error messages.
   - Ensure the chat history is persistent and easy to navigate.
 
