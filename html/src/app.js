@@ -63,9 +63,10 @@ function bindEvents() {
     ui.elements.sendButton?.addEventListener('click', () => handleMessageSend());
     ui.elements.messageInput?.addEventListener('keydown', (e) => handleMessageInputKeydown(e));
     ui.elements.messageInput?.addEventListener('input', () => ui.autoResizeInput());
-    // ui.elements.logoutButton?.addEventListener('click', () => auth.handleLogout());
+    ui.elements.logoutButton?.addEventListener('click', () => auth.handleLogout());
+    ui.elements.backButton?.addEventListener('click', () => ui.hideSettingsPage());
 
-    ui.elements.settingsButton?.addEventListener('click', () => console.log('Settings button clicked'));
+    ui.elements.settingsButton?.addEventListener('click', () => ui.showSettingsPage());
     ui.elements.micButton?.addEventListener('click', () => console.log('Mic button clicked'));
     ui.elements.navChat?.addEventListener('click', () => console.log('Nav chat clicked'));
     ui.elements.navHistory?.addEventListener('click', () => console.log('Nav history clicked'));
