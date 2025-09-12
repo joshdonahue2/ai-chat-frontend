@@ -67,3 +67,15 @@ For a more robust deployment, you can use the provided Docker configuration.
     ```
 
 This will start the application in a detached container, and it will be served by Nginx as defined in the configuration files.
+
+## Information for LLM Assistants
+
+This section contains information specifically for Large Language Model assistants to help them understand and work on this project efficiently.
+
+- **Main Source Code**: The primary frontend source code is located in the `ai-chat-frontend/html/src/` directory.
+- **Dependencies**: Frontend dependencies are managed in `ai-chat-frontend/html/package.json`. To install them, navigate to `ai-chat-frontend/html` and run `npm install`.
+- **Development Server**: To run the development server, navigate to `ai-chat-frontend/html` and run `npm run dev`.
+- **API Communication**: The logic for communicating with the AI backend is in `ai-chat-frontend/html/src/api.js`.
+- **Project Goals**: The high-level goals of the project are documented in `project_goals.md`.
+- **Tech Stack**: The technologies used in this project are listed in `tech_stack.md`.
+- **API Reference**: The API reference for the backend is in `api_reference.md`.
