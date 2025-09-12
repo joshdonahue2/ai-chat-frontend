@@ -14,19 +14,22 @@ ENV SUPABASE_URL=$SUPABASE_URL
 ENV SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
 ENV WEBHOOK_URL=$WEBHOOK_URL
 
-# Copy package.json and package-lock.json
-COPY html/package.json html/package-lock.json ./
+# Copy the html directory
+COPY html/ /app/html/
+
+# Set the working directory to the html folder
+WORKDIR /app/html
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application files
-COPY ./html /app/html
+# Copy the build script
 COPY build.sh /app/
 
 # Make the build script executable and run it
-RUN chmod +x /app/build.sh
-RUN /app/build.sh
+WORKDIR /app
+RUN chmod +x build.sh
+RUN ./build.sh
 
 # Use a new stage for the production environment
 FROM nginx:1.25-alpine
