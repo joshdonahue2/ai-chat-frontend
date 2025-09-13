@@ -7902,7 +7902,8 @@ Option 2: Install and provide the "ws" package:
     screenElements: [
       "appContainer",
       "historyContainer",
-      "settingsContainer"
+      "settingsContainer",
+      "imagenContainer"
     ],
     cacheElements() {
       console.log("=== CACHING ELEMENTS ===");
@@ -7928,7 +7929,9 @@ Option 2: Install and provide the "ws" package:
       this.elements.navChat = document.getElementById("nav-chat");
       this.elements.navHistory = document.getElementById("nav-history");
       this.elements.navSettings = document.getElementById("nav-settings");
+      this.elements.navImagen = document.getElementById("nav-imagen");
       this.elements.settingsContainer = document.getElementById("settings-container");
+      this.elements.imagenContainer = document.getElementById("imagen-container");
       this.elements.backButton = document.getElementById("back-button");
       this.elements.logoutButton = document.getElementById("logout-button");
       this.elements.historyContainer = document.getElementById("history-container");
@@ -7953,6 +7956,7 @@ Option 2: Install and provide the "ws" package:
       this.elements.navChat?.classList.toggle("active", screenId === "appContainer");
       this.elements.navHistory?.classList.toggle("active", screenId === "historyContainer");
       this.elements.navSettings?.classList.toggle("active", screenId === "settingsContainer");
+      this.elements.navImagen?.classList.toggle("active", screenId === "imagenContainer");
     },
     forceShowAuthScreen() {
       this.elements.authContainer?.classList.remove("hidden");
@@ -8051,9 +8055,9 @@ Option 2: Install and provide the "ws" package:
 
   // html/src/api.js
   var config = {
-    supabaseUrl: "YOUR_SUPABASE_URL",
-    supabaseAnonKey: "SUPABASE_ANON_KEY",
-    webhookUrl: "MEMORY_AGENT_WEBHOOK_URL"
+    supabaseUrl: "",
+    supabaseAnonKey: "",
+    webhookUrl: ""
   };
   var supabase;
   var api = {
@@ -8299,8 +8303,47 @@ Option 2: Install and provide the "ws" package:
       loadHistory();
     });
     ui.elements.navSettings?.addEventListener("click", () => ui.showScreen("settingsContainer"));
+    ui.elements.navImagen?.addEventListener("click", () => loadImagenApp());
     ui.elements.micButton?.addEventListener("click", () => console.log("Mic button clicked"));
     console.log("Events bound successfully");
+  }
+  async function loadImagenApp() {
+    ui.showScreen("imagenContainer");
+    const imagenContainer = ui.elements.imagenContainer;
+    if (imagenContainer.innerHTML.trim() === "") {
+      imagenContainer.innerHTML = "<p>Loading Imagen app...</p>";
+      try {
+        const response = await fetch("/imagen/");
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        imagenContainer.innerHTML = "";
+        const styles = doc.head.querySelectorAll("style");
+        styles.forEach((style) => {
+          imagenContainer.appendChild(style.cloneNode(true));
+        });
+        const bodyContent = doc.body.innerHTML;
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = bodyContent;
+        Array.from(tempDiv.children).forEach((child) => {
+          imagenContainer.appendChild(child);
+        });
+        const scripts = doc.body.querySelectorAll("script");
+        scripts.forEach((script) => {
+          const newScript = document.createElement("script");
+          if (script.src) {
+            const scriptUrl = new URL(script.src, window.location.origin + "/imagen/");
+            newScript.src = scriptUrl.href;
+          } else {
+            newScript.textContent = script.textContent;
+          }
+          document.body.appendChild(newScript).remove();
+        });
+      } catch (error) {
+        console.error("Failed to load Imagen app:", error);
+        imagenContainer.innerHTML = "<p>Failed to load Imagen app. Please try again later.</p>";
+      }
+    }
   }
   async function init() {
     try {

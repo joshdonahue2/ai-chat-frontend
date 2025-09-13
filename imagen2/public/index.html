@@ -451,7 +451,7 @@
                     console.log('Session:', session ? 'Present' : 'Missing');
                     console.log('Headers:', headers);
 
-                    const res = await fetch('/api/history', { headers });
+                    const res = await fetch('/imagen/api/history', { headers });
                     if (!res.ok) {
                         throw new Error(`HTTP ${res.status}`);
                     }
@@ -845,7 +845,7 @@
                 this.showStatus('Sending your request to the AI...', 'loading');
                 this.showProgress(10);
                 try {
-                    const response = await fetch('/api/generate', {
+                    const response = await fetch('/imagen/api/generate', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -880,7 +880,7 @@
                         return;
                     }
                     try {
-                        const response = await fetch(`/api/status/${taskId}`);
+                        const response = await fetch(`/imagen/api/status/${taskId}`);
                         if (!response.ok) {
                             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                         }

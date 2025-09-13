@@ -100,10 +100,59 @@ function bindEvents() {
         loadHistory();
     });
     ui.elements.navSettings?.addEventListener('click', () => ui.showScreen('settingsContainer'));
+    ui.elements.navImagen?.addEventListener('click', () => loadImagenApp());
 
     ui.elements.micButton?.addEventListener('click', () => console.log('Mic button clicked'));
 
     console.log('Events bound successfully');
+}
+
+async function loadImagenApp() {
+    ui.showScreen('imagenContainer');
+    const imagenContainer = ui.elements.imagenContainer;
+    if (imagenContainer.innerHTML.trim() === '') {
+        imagenContainer.innerHTML = '<p>Loading Imagen app...</p>';
+        try {
+            const response = await fetch('/imagen/');
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // Clear the container
+            imagenContainer.innerHTML = '';
+
+            // Append styles
+            const styles = doc.head.querySelectorAll('style');
+            styles.forEach(style => {
+                imagenContainer.appendChild(style.cloneNode(true));
+            });
+
+            // Append body content
+            const bodyContent = doc.body.innerHTML;
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = bodyContent;
+            Array.from(tempDiv.children).forEach(child => {
+                imagenContainer.appendChild(child);
+            });
+
+            // Execute scripts
+            const scripts = doc.body.querySelectorAll('script');
+            scripts.forEach(script => {
+                const newScript = document.createElement('script');
+                if (script.src) {
+                    // Adjust script src if it's relative
+                    const scriptUrl = new URL(script.src, window.location.origin + '/imagen/');
+                    newScript.src = scriptUrl.href;
+                } else {
+                    newScript.textContent = script.textContent;
+                }
+                document.body.appendChild(newScript).remove(); // Append and remove to execute
+            });
+        } catch (error) {
+            console.error('Failed to load Imagen app:', error);
+            imagenContainer.innerHTML = '<p>Failed to load Imagen app. Please try again later.</p>';
+        }
+    }
 }
 
 async function init() {
