@@ -107,7 +107,7 @@ export const ui = {
 
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
-        contentDiv.textContent = content;
+        contentDiv.innerHTML = content;
         messageDiv.appendChild(contentDiv);
 
         this.elements.messages.insertBefore(messageDiv, this.elements.thinkingIndicator);

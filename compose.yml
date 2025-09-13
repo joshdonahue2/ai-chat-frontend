@@ -12,7 +12,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    
+    networks:
+      - ai-network
     # Health check
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
@@ -27,3 +28,26 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+  ai-image-generator:
+    build:
+      context: ./imagen2
+      dockerfile: Dockerfile
+    container_name: ai-image-generator
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - ai-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  ai-network:
+    driver: bridge

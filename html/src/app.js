@@ -40,13 +40,17 @@ async function handleMessageSend() {
     ui.addMessage('user', message);
     state.conversationHistory.push({ role: 'user', content: message });
 
-    ui.setLoading(true);
-
-    try {
-        await api.sendMessage(message);
-    } finally {
-        ui.setLoading(false);
-        ui.elements.messageInput?.focus();
+    if (message.startsWith('/imagine ')) {
+        const prompt = message.substring(8);
+        await api.generateImage(prompt);
+    } else {
+        ui.setLoading(true);
+        try {
+            await api.sendMessage(message);
+        } finally {
+            ui.setLoading(false);
+            ui.elements.messageInput?.focus();
+        }
     }
 }
 

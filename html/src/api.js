@@ -5,7 +5,8 @@ import { ui } from './ui.js';
 const config = {
     supabaseUrl: process.env.SUPABASE_URL,
     supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
-    webhookUrl: process.env.WEBHOOK_URL
+    webhookUrl: process.env.WEBHOOK_URL,
+    imageGeneratorUrl: 'http://localhost:3000/api/generate'
 };
 
 let supabase;
@@ -67,6 +68,34 @@ export const api = {
             console.error('Send message error:', error);
             ui.addMessage('assistant', 'Sorry, I encountered an error. Please try again.');
             ui.showToast('Failed to get a response from the assistant.', 'error');
+        }
+    },
+
+    async generateImage(prompt) {
+        ui.setLoading(true);
+        try {
+            const response = await fetch(config.imageGeneratorUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ prompt })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data.imageUrl) {
+                ui.addMessage('assistant', `<img src="${data.imageUrl}" alt="Generated image for: ${prompt}" />`);
+            } else {
+                ui.addMessage('assistant', 'Sorry, I couldn\'t generate an image. Please try again.');
+            }
+        } catch (error) {
+            console.error('Image generation error:', error);
+            ui.addMessage('assistant', 'Sorry, there was an error generating the image.');
+            ui.showToast('Failed to generate image.', 'error');
+        } finally {
+            ui.setLoading(false);
         }
     },
 
