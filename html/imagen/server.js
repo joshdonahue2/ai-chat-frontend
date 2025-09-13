@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 // Helper: get user from Supabase access token
 async function getUserFromToken(token) {
     if (!token) return null;
