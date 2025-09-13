@@ -447,3 +447,7 @@ body {
         padding: var(--spacing-sm);
     }
 }
+
+body:has(.auth-container:not(.hidden)) .imagen-container {
+    display: none;
+}

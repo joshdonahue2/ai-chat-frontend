@@ -82,5 +82,30 @@ export const api = {
             { role: 'user', content: 'This is another message from the past.' },
             { role: 'assistant', content: 'And this is another response.' },
         ]);
-    }
+    },
+
+    async generateImage(prompt) {
+        const { data: { session } } = await supabase.auth.getSession();
+        const response = await fetch('/api/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session?.access_token}`
+            },
+            body: JSON.stringify({ prompt })
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to start image generation');
+        }
+        return response.json();
+    },
+
+    async getImageStatus(taskId) {
+        const response = await fetch(`/api/status/${taskId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    },
 };

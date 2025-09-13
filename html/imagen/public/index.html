@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        html,body { height: 100%; }
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(1200px 600px at 10% 10%, rgba(162,89,255,0.14), transparent),
+                        radial-gradient(1000px 500px at 90% 90%, rgba(255,110,0,0.12), transparent),
+                        linear-gradient(135deg, #0f0f14 0%, #15151b 100%);
+            color: #eef2ff;
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+            padding: 32px;
+        }
+        .container {
+            width: 100%;
+            max-width: 980px;
+            border-radius: 18px;
+            padding: 28px;
+            background: linear-gradient(180deg, rgba(24,24,34,0.75), rgba(16,16,24,0.6));
+            border: 1px solid rgba(255,255,255,0.04);
+            box-shadow: 0 10px 40px rgba(8,8,10,0.6), 0 6px 20px rgba(162,89,255,0.06);
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 24px;
+            align-items: start;
+        }
+        header.app-header { grid-column: 1 / -1; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+        .brand { display:flex; align-items:center; gap:12px; }
+        .logo { width:56px; height:56px; border-radius:12px; background: linear-gradient(135deg,#ff6e00,#a259ff); display:flex; align-items:center; justify-content:center; font-weight:800; color:#0b0b0d; box-shadow: 0 6px 22px rgba(162,89,255,0.12); }
+        h1 { font-size:1.6rem; margin:0; font-weight:800; color:linear-gradient(90deg,#fff,#fff); }
+        .subtitle { color: rgba(238,242,255,0.7); font-weight:600; font-size:0.95rem; }
+
+        /* Left column (main) */
+        #mainPages { padding: 8px 6px; }
+        .card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+            border-radius: 12px;
+            padding: 18px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        label { display:block; margin-bottom:8px; color:#e9e9ff; font-weight:600; }
+        input, textarea { width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(162,89,255,0.14); background:rgba(255,255,255,0.02); color:#fff; font-size:14px; }
+        textarea { min-height:120px; resize:vertical; }
+
+        .generate-btn, .download-btn, #logoutBtn { display:inline-flex; align-items:center; gap:10px; justify-content:center; padding:12px 16px; border-radius:10px; border:none; cursor:pointer; font-weight:700; }
+        .generate-btn { background: linear-gradient(90deg,#ff7b2f,#9a5bff); color:#0b0b0d; box-shadow: 0 8px 30px rgba(154,91,255,0.12); }
+        .generate-btn:hover { transform:translateY(-3px); box-shadow: 0 18px 50px rgba(154,91,255,0.18); }
+        .download-btn { background: linear-gradient(90deg,#6e4cff,#ff9b45); color:#fff; }
+
+        .loading-spinner { width:18px; height:18px; border-radius:50%; border:3px solid rgba(255,255,255,0.08); border-top-color:#ffb77a; animation:spin 1s linear infinite; display:none; }
+        @keyframes spin{ to { transform:rotate(360deg); } }
+
+        /* Right column (sidebar) */
+        .sidebar { padding:18px; display:flex; flex-direction:column; gap:12px; }
+        .user-panel { display:flex; align-items:center; gap:12px; justify-content:space-between; }
+        .user-email { font-weight:700; color:#fff; }
+
+        /* Dropdown menu */
+        .menu-wrap { position:relative; }
+        #dropdownBtn { background:transparent; border:1px solid rgba(255,255,255,0.04); padding:8px 12px; border-radius:10px; color:#fff; display:flex; align-items:center; gap:8px; }
+        #dropdownMenu { position:absolute; right:0; top:48px; min-width:220px; background:linear-gradient(180deg, rgba(18,18,26,0.98), rgba(16,16,24,0.95)); border-radius:12px; padding:8px; box-shadow: 0 12px 40px rgba(8,8,10,0.6); opacity:0; transform:translateY(-6px) scale(0.98); pointer-events:none; transition: all 180ms ease; border:1px solid rgba(162,89,255,0.06); }
+        #dropdownMenu.open { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+        .dropdown-item { display:flex; align-items:center; gap:10px; padding:10px 12px; color:#eef2ff; text-decoration:none; border-radius:8px; transition: background 120ms, transform 120ms; }
+        .dropdown-item:hover { background: linear-gradient(90deg, rgba(255,110,0,0.06), rgba(162,89,255,0.06)); transform:translateX(6px); }
+        .dropdown-item .icon { width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; border-radius:8px; background:rgba(255,255,255,0.02); font-size:16px; }
+
+        .history-item { display:flex; gap:12px; align-items:center; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.02); margin-bottom:8px; }
+        .history-thumb { width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid rgba(162,89,255,0.06); }
+
+        .status { padding:12px; border-radius:8px; font-weight:600; display:none; }
+        .status.success { background:linear-gradient(90deg,#fff7ee,#efe6ff); color:#ff6e00; }
+        .status.error { background:linear-gradient(90deg,#ffecec,#f3e1ff); color:#a259ff; }
+
+        /* Modal styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            padding: 20px;
+        }
+        .modal-content {
+            max-width: 90%;
+            max-height: 90vh;
+            margin: auto;
+            position: relative;
+            text-align: center;
+        }
+        .modal-image {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .modal-controls {
+            margin-top: 16px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+        .modal-button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .btn-icon {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            cursor: pointer;
+            color: #fff;
+            transition: all 0.2s;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-icon:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+        .history-thumb {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(162,89,255,0.06);
+        }
+        .history-item {
+            display: flex;
+            gap: 16px;
+            align-items: start;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.02);
+            margin-bottom: 12px;
+            background: rgba(255,255,255,0.02);
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .history-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .favorite-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s, transform 0.2s;
+            z-index: 2;
+        }
+        .favorite-btn:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+        .favorite-btn.active {
+            opacity: 1;
+            color: #ffd700;
+        }
+        .copy-prompt {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 8px;
+            color: rgba(255,255,255,0.7);
+            transition: all 0.2s;
+        }
+        .copy-prompt:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .tooltip {
+            position: absolute;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 1000;
+        }
+
+        @media (max-width: 880px) {
+            .container { grid-template-columns: 1fr; }
+            #dropdownMenu { right:8px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal-overlay" onclick="if(event.target === this) closeImageModal()">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeImageModal()">×</button>
+            <img id="modalImage" class="modal-image" alt="Full size image">
+            <div class="modal-controls">
+                <button class="modal-button download-btn" onclick="downloadModalImage()">
+                    <span>⬇️</span>Download Image
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header class="app-header">
+            <div class="brand">
+                <div class="logo">AI</div>
+                <div>
+                    <h1>AI Image Studio</h1>
+                    <div class="subtitle">Generate, save, and manage beautiful AI images</div>
+                </div>
+            </div>
+            <div class="menu-wrap">
+                <div id="authSection">
+                    <form id="registerForm" style="margin-bottom: 12px;">
+                        <h2 style="margin:0 0 8px 0;">Register</h2>
+                        <input type="email" id="registerEmail" placeholder="Email" required style="margin-bottom: 8px; width: 100%; padding: 10px;" />
+                        <input type="password" id="registerPassword" placeholder="Password" required style="margin-bottom: 8px; width: 100%; padding: 10px;" />
+                        <button type="submit" class="generate-btn">Sign Up</button>
+                    </form>
+                    <form id="loginForm">
+                        <h2 style="margin:0 0 8px 0;">Login</h2>
+                        <input type="email" id="loginEmail" placeholder="Email" required style="margin-bottom: 8px; width: 100%; padding: 10px;" />
+                        <input type="password" id="loginPassword" placeholder="Password" required style="margin-bottom: 8px; width: 100%; padding: 10px;" />
+                        <button type="submit" class="generate-btn">Log In</button>
+                    </form>
+                </div>
+            </div>
+        </header>
+        <div id="userSection" style="display:none;">
+            <div class="user-panel">
+                <div>
+                    <div id="userEmail" class="user-email"></div>
+                    <div style="font-size:12px; color:rgba(238,242,255,0.7);">Member</div>
+                </div>
+                <div class="menu-wrap">
+                    <button id="dropdownBtn" aria-haspopup="true" aria-expanded="false">☰ Menu</button>
+                    <nav id="dropdownMenu" role="menu" aria-hidden="true">
+                        <a href="#" id="generationLink" class="dropdown-item" role="menuitem"><span class="icon">🎨</span><span>Generate Image</span></a>
+                        <a href="#" id="historyLink" class="dropdown-item" role="menuitem"><span class="icon">🖼️</span><span>Image History</span></a>
+                        <a href="#" id="accountLink" class="dropdown-item" role="menuitem"><span class="icon">⚙️</span><span>Account Settings</span></a>
+                        <a href="#" id="logoutLink" class="dropdown-item" role="menuitem" style="color:#ffb37a;"><span class="icon">🚪</span><span>Logout</span></a>
+                    </nav>
+                </div>
+            </div>
+            <div id="mainPages">
+                <div id="homePage" style="display:none;">
+                    <div class="card">
+                        <form id="imageForm">
+                            <div class="form-group">
+                                <label for="prompt">Describe the image you want to generate:</label>
+                                <textarea 
+                                    id="prompt" 
+                                    name="prompt" 
+                                    class="prompt-input" 
+                                    placeholder="A majestic mountain landscape at sunset with vibrant colors..."
+                                    required
+                                ></textarea>
+                            </div>
+                            <button type="submit" id="generateBtn" class="generate-btn">
+                                <div class="loading-spinner"></div>
+                                <span id="btnText">Generate Image</span>
+                            </button>
+                            <div class="progress-bar" id="progressBar" style="display:none; margin-top:12px; height:8px; background:rgba(255,255,255,0.03); border-radius:6px; overflow:hidden;">
+                                <div class="progress-fill" id="progressFill" style="background:linear-gradient(90deg,#ff7b2f,#9a5bff); width:0%; height:100%;"></div>
+                            </div>
+                        </form>
+                        <div id="status" class="status" style="display:none; margin-top:12px;"></div>
+                        <div id="resultSection" class="result-section" style="margin-top:12px; display:none;">
+                            <img id="generatedImage" class="generated-image" alt="Generated image" style="width:100%; border-radius:10px;" />
+                            <button id="downloadBtn" class="download-btn" style="margin-top:10px;">Download Image</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="historyPage" style="display:none;">
+                    <div class="card">
+                        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h2 style="margin:0; color:#a259ff;">🖼️ Your Image History</h2>
+                            <div class="history-controls" style="display:flex; gap:12px; align-items:center;">
+                                <div class="search-box" style="position:relative;">
+                                    <input type="text" id="imageSearch" placeholder="Search prompts..." 
+                                           style="padding-left: 32px; width: 200px;">
+                                    <span style="position:absolute; left:10px; top:50%; transform:translateY(-50%);">🔍</span>
+                                </div>
+                                <select id="sortImages" style="padding:8px; border-radius:8px; background:rgba(255,255,255,0.05); color:#fff; border:1px solid rgba(255,255,255,0.1);">
+                                    <option value="newest">Newest First</option>
+                                    <option value="oldest">Oldest First</option>
+                                    <option value="favorites">Favorites</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="historyList" style="margin-top:12px;"></div>
+                    </div>
+                </div>
+                <div id="accountPage" style="display:none;">
+                    <div class="card">
+                        <h2 style="margin:0 0 8px 0; color:#ff9b45;">⚙️ Account Settings</h2>
+                        <div id="accountInfo" style="margin-top:12px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script>
+        // Dropdown menu logic
+        function setupDropdownMenu() {
+            const dropdownBtn = document.getElementById('dropdownBtn');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            function openMenu() {
+                dropdownMenu.classList.add('open');
+                dropdownMenu.setAttribute('aria-hidden', 'false');
+                dropdownBtn.setAttribute('aria-expanded', 'true');
+            }
+            function closeMenu() {
+                dropdownMenu.classList.remove('open');
+                dropdownMenu.setAttribute('aria-hidden', 'true');
+                dropdownBtn.setAttribute('aria-expanded', 'false');
+            }
+            dropdownBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (dropdownMenu.classList.contains('open')) closeMenu();
+                else openMenu();
+            });
+            document.addEventListener('click', (e) => {
+                if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                    closeMenu();
+                }
+            });
+            document.getElementById('logoutLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                handleLogout();
+                closeMenu();
+            });
+            document.getElementById('historyLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                showImageHistory();
+                closeMenu();
+            });
+            document.getElementById('accountLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                showAccountSettings();
+                closeMenu();
+            });
+            document.getElementById('generationLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('homePage');
+                closeMenu();
+            });
+        }
+
+        // Page navigation logic
+        function showPage(page) {
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('historyPage').style.display = 'none';
+            document.getElementById('accountPage').style.display = 'none';
+            document.getElementById(page).style.display = 'block';
+
+            // Initialize search and sort handlers when showing history page
+            if (page === 'historyPage') {
+                const searchInput = document.getElementById('imageSearch');
+                const sortSelect = document.getElementById('sortImages');
+                
+                // Debounce function to avoid too many refreshes
+                let searchTimeout;
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => showImageHistory(), 300);
+                });
+                
+                sortSelect.addEventListener('change', () => showImageHistory());
+            }
+        }
+        // Initialize favorites handling
+        let imageHistory = {
+            favorites: JSON.parse(localStorage.getItem('imageFavorites') || '{}'),
+            toggleFavorite: function(imageId) {
+                if (this.favorites[imageId]) {
+                    delete this.favorites[imageId];
+                } else {
+                    this.favorites[imageId] = true;
+                }
+                localStorage.setItem('imageFavorites', JSON.stringify(this.favorites));
+                return this.favorites[imageId];
+            }
+        };
+
+        function showImageHistory() {
+            showPage('historyPage');
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '<div style="color:#fff;">Loading...</div>';
+
+            // Ensure we have a session (try Supabase client if local session missing)
+            (async () => {
+                try {
+                    if (!session) {
+                        const s = await supabase.auth.getSession();
+                        if (s && s.data && s.data.session) session = s.data.session;
+                    }
+
+                    const headers = {};
+                    if (session && session.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
+                    console.log('Session:', session ? 'Present' : 'Missing');
+                    console.log('Headers:', headers);
+
+                    const res = await fetch('/api/history', { headers });
+                    if (!res.ok) {
+                        throw new Error(`HTTP ${res.status}`);
+                    }
+                    const data = await res.json();
+                    console.log('History response:', data);
+
+                    // Initialize search input and sort select if they don't exist
+                    if (!document.getElementById('imageSearch')) {
+                        const searchBox = document.createElement('div');
+                        searchBox.innerHTML = `
+                            <div class="search-box" style="position:relative;">
+                                <input type="text" id="imageSearch" placeholder="Search prompts..." 
+                                       style="padding-left: 32px; width: 200px;">
+                                <span style="position:absolute; left:10px; top:50%; transform:translateY(-50%);">🔍</span>
+                            </div>`;
+                        historyList.parentElement.insertBefore(searchBox, historyList);
+                    }
+                    
+                    if (!document.getElementById('sortImages')) {
+                        const sortSelect = document.createElement('select');
+                        sortSelect.id = 'sortImages';
+                        sortSelect.innerHTML = `
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="favorites">Favorites</option>
+                        `;
+                        sortSelect.style.cssText = 'padding:8px; border-radius:8px; background:rgba(255,255,255,0.05); color:#fff; border:1px solid rgba(255,255,255,0.1);';
+                        historyList.parentElement.insertBefore(sortSelect, historyList);
+                    }
+
+                    // Get favorites from localStorage
+                    const favorites = JSON.parse(localStorage.getItem('imageFavorites') || '{}');
+
+                    if (!data.history || data.history.length === 0) {
+                        historyList.innerHTML = '<div style="color:#fff;">No images found.</div>';
+                        return;
+                    }
+
+                    // Get search query and sort option
+                    const searchQuery = (document.getElementById('imageSearch')?.value || '').toLowerCase();
+                    const sortOption = document.getElementById('sortImages')?.value || 'newest';
+
+                    // Filter and sort the history
+                    let filteredHistory = [...data.history];
+                    
+                    // Apply search filter
+                    if (searchQuery) {
+                        filteredHistory = filteredHistory.filter(item => 
+                            item.prompt.toLowerCase().includes(searchQuery)
+                        );
+                    }
+
+                    // Apply sorting
+                    filteredHistory.sort((a, b) => {
+                        if (sortOption === 'oldest') {
+                            return new Date(a.created_at) - new Date(b.created_at);
+                        } else if (sortOption === 'favorites') {
+                            return (favorites[b.id] ? 1 : 0) - (favorites[a.id] ? 1 : 0);
+                        } else {
+                            return new Date(b.created_at) - new Date(a.created_at);
+                        }
+                    });
+
+                    historyList.innerHTML = '';
+                    filteredHistory.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'history-item';
+
+                        const imgWrapper = document.createElement('div');
+                        imgWrapper.style.display = 'flex';
+                        imgWrapper.style.flexDirection = 'column';
+                        imgWrapper.style.gap = '8px';
+                        imgWrapper.style.alignItems = 'center';
+
+                        const img = document.createElement('img');
+                        img.className = 'history-thumb';
+
+                        const actions = document.createElement('div');
+                        actions.className = 'action-buttons';
+                        actions.style.display = 'flex';
+                        actions.style.gap = '8px';
+                        actions.style.justifyContent = 'center';
+
+                        const viewBtn = document.createElement('button');
+                        viewBtn.className = 'btn-icon';
+                        viewBtn.innerHTML = '🔍 View Full Size';
+                        viewBtn.title = 'View full size';
+
+                        const downloadBtn = document.createElement('button');
+                        downloadBtn.className = 'btn-icon';
+                        downloadBtn.innerHTML = '⬇️ Download';
+                        downloadBtn.title = 'Download image';
+
+                        actions.appendChild(viewBtn);
+                        actions.appendChild(downloadBtn);
+                        imgWrapper.appendChild(img);
+                        imgWrapper.appendChild(actions);
+
+                        // Determine image source format and handle accordingly
+                        const raw = item.image_data || item.image || item.image_url || '';
+                        if (typeof raw === 'string') {
+                            const trimmed = raw.trim();
+                            if (trimmed.startsWith('data:')) {
+                                img.src = trimmed;
+                            } else if (/^https?:\/\//i.test(trimmed)) {
+                                img.src = trimmed;
+                            } else if (/^[A-Za-z0-9+/=\s]+$/.test(trimmed) && trimmed.length > 50) {
+                                // Likely raw base64
+                                img.src = `data:image/png;base64,${trimmed.replace(/\s+/g, '')}`;
+                            } else {
+                                // Fallback: try to decode URI component
+                                try {
+                                    const decoded = decodeURIComponent(trimmed);
+                                    if (decoded.startsWith('data:')) img.src = decoded;
+                                    else img.alt = 'No preview available';
+                                } catch (e) {
+                                    img.alt = 'No preview available';
+                                }
+                            }
+                        } else {
+                            img.alt = 'No preview available';
+                        }
+
+                        // Fallback when image can't load
+                        img.onerror = function() {
+                            this.style.display = 'none';
+                            const placeholder = document.createElement('div');
+                            placeholder.style.width = '64px';
+                            placeholder.style.height = '64px';
+                            placeholder.style.borderRadius = '8px';
+                            placeholder.style.background = 'linear-gradient(90deg, rgba(255,110,0,0.06), rgba(162,89,255,0.06))';
+                            placeholder.style.display = 'inline-block';
+                            div.insertBefore(placeholder, div.firstChild);
+                        };
+
+                        const meta = document.createElement('div');
+                        meta.className = 'history-meta';
+                        meta.style.flex = '1';
+
+                        // Favorite button
+                        const favBtn = document.createElement('button');
+                        favBtn.className = `favorite-btn ${favorites[item.id] ? 'active' : ''}`;
+                        favBtn.innerHTML = favorites[item.id] ? '⭐' : '☆';
+                        favBtn.title = favorites[item.id] ? 'Remove from favorites' : 'Add to favorites';
+                        favBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            const newFavorites = { ...favorites };
+                            if (newFavorites[item.id]) {
+                                delete newFavorites[item.id];
+                                favBtn.innerHTML = '☆';
+                                favBtn.classList.remove('active');
+                            } else {
+                                newFavorites[item.id] = true;
+                                favBtn.innerHTML = '⭐';
+                                favBtn.classList.add('active');
+                            }
+                            localStorage.setItem('imageFavorites', JSON.stringify(newFavorites));
+                            if (document.getElementById('sortImages').value === 'favorites') {
+                                showImageHistory(); // Refresh list if sorted by favorites
+                            }
+                        };
+                        div.appendChild(favBtn);
+
+                        const prompt = document.createElement('div');
+                        prompt.className = 'prompt';
+                        prompt.style.display = 'flex';
+                        prompt.style.alignItems = 'center';
+
+                        const promptText = document.createElement('span');
+                        promptText.textContent = item.prompt || '(no prompt)';
+                        prompt.appendChild(promptText);
+
+                        // Copy prompt button
+                        const copyBtn = document.createElement('button');
+                        copyBtn.className = 'copy-prompt';
+                        copyBtn.innerHTML = '📋';
+                        copyBtn.title = 'Copy prompt';
+                        copyBtn.onclick = async (e) => {
+                            e.stopPropagation();
+                            await navigator.clipboard.writeText(item.prompt);
+                            
+                            // Show tooltip
+                            const tooltip = document.createElement('div');
+                            tooltip.className = 'tooltip';
+                            tooltip.textContent = 'Copied!';
+                            tooltip.style.opacity = '0';
+                            document.body.appendChild(tooltip);
+                            
+                            const rect = copyBtn.getBoundingClientRect();
+                            tooltip.style.top = rect.top - 30 + 'px';
+                            tooltip.style.left = rect.left + 'px';
+                            tooltip.style.opacity = '1';
+                            
+                            setTimeout(() => {
+                                tooltip.style.opacity = '0';
+                                setTimeout(() => document.body.removeChild(tooltip), 200);
+                            }, 1000);
+                        };
+                        prompt.appendChild(copyBtn);
+
+                        const timestamp = document.createElement('div');
+                        timestamp.className = 'timestamp';
+                        timestamp.style.fontSize = '12px';
+                        timestamp.style.color = 'rgba(238,242,255,0.7)';
+                        timestamp.textContent = item.created_at ? new Date(item.created_at).toLocaleString() : '';
+
+                        meta.appendChild(prompt);
+                        meta.appendChild(timestamp);
+
+                        // Set up click handlers for the buttons
+                        viewBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            openImageModal(raw, item.prompt);
+                        });
+
+                        downloadBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const a = document.createElement('a');
+                            let imageUrl;
+
+                            if (raw.startsWith('data:')) {
+                                imageUrl = raw;
+                            } else if (raw.startsWith('http')) {
+                                imageUrl = raw;
+                            } else {
+                                imageUrl = `data:image/png;base64,${raw}`;
+                            }
+
+                            a.href = imageUrl;
+                            a.download = `ai-image-${item.task_id || new Date().toISOString().slice(0,19).replace(/[-:]/g,'')}.png`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                        });
+
+                        // Make the thumbnail clickable too
+                        img.style.cursor = 'pointer';
+                        img.addEventListener('click', () => openImageModal(raw, item.prompt));
+
+                        div.appendChild(imgWrapper);
+                        div.appendChild(meta);
+                        historyList.appendChild(div);
+                    });
+                } catch (err) {
+                    console.error('Failed to load history:', err);
+                    historyList.innerHTML = '<div style="color:#fff;">Failed to load history.</div>';
+                }
+            })();
+        }
+        function showAccountSettings() {
+            showPage('accountPage');
+            const info = document.getElementById('accountInfo');
+            info.innerHTML = '<div style="color:#fff;">Loading...</div>';
+            if (session && session.user) {
+                info.innerHTML = `<div class="account-label">Email:</div><div class="account-value">${session.user.email}</div>` +
+                    `<button class="reset-btn" id="resetPasswordBtn">Reset Password</button>`;
+                document.getElementById('resetPasswordBtn').onclick = function() {
+                    supabase.auth.resetPasswordForEmail(session.user.email)
+                        .then(({ error }) => {
+                            if (error) alert(error.message);
+                            else alert('Password reset email sent!');
+                        });
+                };
+            } else {
+                info.innerHTML = '<div style="color:#fff;">No account info found.</div>';
+            }
+        }
+        // Supabase client setup
+    const SUPABASE_URL = "https://wsdhbovoemlberuobkdn.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzZGhib3ZvZW1sYmVydW9ia2RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1OTAwNDEsImV4cCI6MjA3MjE2NjA0MX0.0_Sf8IQRPI5xtXICX6Ft6JWevItcm2oPZ8n4GRmGlyE";
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let session = null;
+        let currentImageData = null;
+
+        // Modal functions
+        function openImageModal(imageData, prompt) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            currentImageData = imageData;
+
+            // Set image source based on format
+            if (imageData.startsWith('data:')) {
+                modalImg.src = imageData;
+            } else if (imageData.startsWith('http')) {
+                modalImg.src = imageData;
+            } else {
+                modalImg.src = `data:image/png;base64,${imageData}`;
+            }
+
+            modalImg.alt = prompt || 'Generated image';
+            modal.style.display = 'flex';
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
+            currentImageData = null;
+        }
+
+        function downloadModalImage() {
+            if (!currentImageData) return;
+            
+            const a = document.createElement('a');
+            let imageUrl;
+
+            if (currentImageData.startsWith('data:')) {
+                imageUrl = currentImageData;
+            } else if (currentImageData.startsWith('http')) {
+                imageUrl = currentImageData;
+            } else {
+                imageUrl = `data:image/png;base64,${currentImageData}`;
+            }
+
+            a.href = imageUrl;
+            a.download = `ai-image-${new Date().toISOString().slice(0,19).replace(/[-:]/g,'')}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function showUserSection(email) {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('userSection').style.display = 'block';
+            document.getElementById('userEmail').textContent = email;
+        }
+        function showAuthSection() {
+            document.getElementById('authSection').style.display = 'block';
+            document.getElementById('userSection').style.display = 'none';
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            if (!email || !password) return;
+            const { data, error } = await supabase.auth.signUp({ email, password });
+            if (error) {
+                alert(error.message);
+            } else {
+                alert('Registration successful! Please check your email to confirm.');
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            if (!email || !password) return;
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) {
+                alert(error.message);
+            } else {
+                session = data.session;
+                showUserSection(data.user.email);
+            }
+        }
+
+        function handleLogout() {
+            supabase.auth.signOut();
+            session = null;
+            showAuthSection();
+        }
+
+        // Image generation logic (uses session token)
+        class ImageGenerator {
+            constructor() {
+                this.form = document.getElementById('imageForm');
+                this.generateBtn = document.getElementById('generateBtn');
+                this.btnText = document.getElementById('btnText');
+                this.spinner = document.querySelector('.loading-spinner');
+                this.status = document.getElementById('status');
+                this.resultSection = document.getElementById('resultSection');
+                this.generatedImage = document.getElementById('generatedImage');
+                this.downloadBtn = document.getElementById('downloadBtn');
+                this.progressBar = document.getElementById('progressBar');
+                this.progressFill = document.getElementById('progressFill');
+                this.currentImageBlob = null;
+                this.pollInterval = null;
+                this.bindEvents();
+            }
+            bindEvents() {
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+                this.downloadBtn.addEventListener('click', () => this.downloadImage());
+            }
+            async handleSubmit(e) {
+                e.preventDefault();
+                const prompt = document.getElementById('prompt').value.trim();
+                if (!prompt) return;
+                this.setLoading(true);
+                this.hideResult();
+                this.showStatus('Sending your request to the AI...', 'loading');
+                this.showProgress(10);
+                try {
+                    const response = await fetch('/api/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': session ? `Bearer ${session.access_token}` : ''
+                        },
+                        body: JSON.stringify({ prompt })
+                    });
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Failed to start generation');
+                    }
+                    this.showProgress(30);
+                    this.showStatus('Your image is being generated...', 'loading');
+                    await this.pollForResult(data.taskId);
+                } catch (error) {
+                    console.error('Generation error:', error);
+                    this.showStatus(`Error: ${error.message}`, 'error');
+                } finally {
+                    this.setLoading(false);
+                    this.hideProgress();
+                }
+            }
+            async pollForResult(taskId) {
+                let attempts = 0;
+                const maxAttempts = 120;
+                let lastStatus = 'pending';
+                this.pollInterval = setInterval(async () => {
+                    attempts++;
+                    if (attempts > maxAttempts) {
+                        clearInterval(this.pollInterval);
+                        this.showStatus('Generation timed out after 10 minutes.', 'error');
+                        return;
+                    }
+                    try {
+                        const response = await fetch(`/api/status/${taskId}`);
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        const data = await response.json();
+                        if (data.status !== lastStatus) {
+                            lastStatus = data.status;
+                            this.updateStatusMessage(data.status, attempts);
+                        }
+                        if (data.status === 'completed' && data.imageData) {
+                            clearInterval(this.pollInterval);
+                            this.showProgress(100);
+                            await this.displayResult(data.imageData);
+                        } else if (data.status === 'error') {
+                            clearInterval(this.pollInterval);
+                            this.showStatus(`Generation failed: ${data.error || 'Unknown error'}`, 'error');
+                        } else {
+                            let progress = 30;
+                            if (data.status === 'processing') {
+                                progress = Math.min(40 + (attempts * 1), 85);
+                            } else {
+                                progress = Math.min(30 + (attempts * 0.5), 70);
+                            }
+                            this.showProgress(progress);
+                        }
+                    } catch (error) {
+                        console.error('Polling error:', error);
+                    }
+                }, 5000);
+            }
+            updateStatusMessage(status, attempts) {
+                const elapsed = Math.floor(attempts * 5 / 60);
+                const minutes = elapsed > 0 ? ` (${elapsed}m elapsed)` : '';
+                switch (status) {
+                    case 'pending':
+                        this.showStatus(`Sending request to n8n...${minutes}`, 'loading');
+                        break;
+                    case 'processing':
+                        this.showStatus(`AI is generating your image...${minutes}`, 'loading');
+                        break;
+                    default:
+                        this.showStatus(`Processing your request...${minutes}`, 'loading');
+                }
+            }
+            async displayResult(base64Data) {
+                const existingImage = document.getElementById('generatedImage');
+                try {
+                    if (!base64Data || typeof base64Data !== 'string') {
+                        throw new Error('Invalid or missing base64 data.');
+                    }
+                    const imageUrl = `data:image/png;base64,${base64Data.replace(/\s/g, '')}`;
+                    const preloader = new Image();
+                    preloader.onload = () => {
+                        existingImage.src = preloader.src;
+                        this.showResult();
+                        this.showStatus('Image generated successfully!', 'success');
+                    };
+                    preloader.onerror = () => {
+                        this.showStatus('Error: The generated image data was corrupt.', 'error');
+                    };
+                    preloader.src = imageUrl;
+                } catch (error) {
+                    this.showStatus(`Failed to display image: ${error.message}`, 'error');
+                }
+            }
+            downloadImage() {
+                const imageUrl = this.generatedImage.src;
+                if (!imageUrl || !imageUrl.startsWith('data:image')) {
+                    this.showStatus('Could not download image.', 'error');
+                    return;
+                }
+                const a = document.createElement('a');
+                a.href = imageUrl;
+                a.download = `generated-image-${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+            hideResult() {
+                this.resultSection.style.display = 'none';
+                this.generatedImage.src = '';
+            }
+            setLoading(loading) {
+                this.generateBtn.disabled = loading;
+                this.spinner.style.display = loading ? 'inline-block' : 'none';
+                this.btnText.textContent = loading ? 'Generating...' : 'Generate Image';
+            }
+            showStatus(message, type) {
+                this.status.textContent = message;
+                this.status.className = `status ${type}`;
+                this.status.style.display = 'block';
+            }
+            hideStatus() {
+                this.status.style.display = 'none';
+            }
+            showResult() {
+                this.resultSection.style.display = 'block';
+            }
+            showProgress(percentage) {
+                this.progressBar.style.display = 'block';
+                this.progressFill.style.width = `${percentage}%`;
+            }
+            hideProgress() {
+                this.progressBar.style.display = 'none';
+                this.progressFill.style.width = '0%';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            setupDropdownMenu();
+            showAuthSection();
+            showPage('homePage');
+            new ImageGenerator();
+        });
+    </script>
+</body>
+</html>
