@@ -51,178 +51,183 @@
             <p id="auth-toggle-link" class="auth-toggle">Need an account? Sign Up</p>
         </div>
 
-        <!-- MAIN APPLICATION SCREENS -->
-        <div id="app-container" class="app-container">
-            <header class="header">
-                <div class="header-content">
-                    <h1>🧠 AI Memory Agent</h1>
-                    <button id="settings-button" class="btn-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2.73l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2.73l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </button>
-                </div>
-            </header>
-            <main class="chat-container">
-                <div class="messages" id="messages" role="log" aria-live="polite" aria-label="Chat messages">
-                    <div class="message assistant" id="thinking-indicator" style="display: none;">
-                        <div class="message-content">
-                            <div class="typing-indicator">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <footer class="input-container">
-                    <div class="input-row">
-                        <button id="mic-button" class="btn-icon">
+        <!-- MAIN APPLICATION CONTENT -->
+        <div class="main-content">
+            <!-- CHAT VIEW -->
+            <div id="app-container" class="app-container">
+                <header class="header">
+                    <div class="header-content">
+                        <h1>🧠 AI Memory Agent</h1>
+                        <button id="settings-button" class="btn-icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line>
-                            </svg>
-                        </button>
-                        <div class="input-wrapper">
-                            <textarea 
-                                class="message-input" 
-                                id="messageInput" 
-                                placeholder="Type your message..."
-                                rows="1"
-                                aria-label="Message input"
-                                maxlength="4000"
-                            ></textarea>
-                        </div>
-                        <button class="send-button" id="sendButton" aria-label="Send message">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9"></polygon>
+                                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2.73l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2.73l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle>
                             </svg>
                         </button>
                     </div>
-                </footer>
-            </main>
-        </div>
-
-        <!-- HISTORY VIEW -->
-        <div id="history-container" class="history-container hidden">
-            <header class="header">
-                <div class="header-content">
-                    <h1>Chat History</h1>
-                </div>
-            </header>
-            <main class="history-content">
-                <ul id="history-list" class="history-list">
-                    <!-- History items will be populated here -->
-                </ul>
-            </main>
-        </div>
-
-        <!-- SETTINGS VIEW -->
-        <div id="settings-container" class="settings-container hidden">
-            <header class="header">
-                <div class="header-content">
-                    <button id="back-button" class="btn-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline>
-                        </svg>
-                    </button>
-                    <h1>Settings</h1>
-                </div>
-            </header>
-            <main class="settings-content">
-                <div class="settings-section">
-                    <h3>Account</h3>
-                    <button id="logout-button" class="btn btn-danger">Logout</button>
-                </div>
-                <div class="settings-section">
-                    <h3>Theme</h3>
-                    <p>Theme selection coming soon!</p>
-                </div>
-            </main>
-        </div>
-        
-        <!-- IMAGEN VIEW -->
-        <div id="imagen-container" class="imagen-container hidden">
-<!-- Image Modal -->
-<div id="imageModal" class="modal-overlay" onclick="if(event.target === this) closeImageModal()">
-    <div class="modal-content">
-        <button class="modal-close" onclick="closeImageModal()">×</button>
-        <img id="modalImage" class="modal-image" alt="Full size image">
-        <div class="modal-controls">
-            <button class="modal-button download-btn" onclick="downloadModalImage()">
-                <span>⬇️</span>Download Image
-            </button>
-        </div>
-    </div>
-</div>
-
-    <header class="app-header">
-        <div class="brand">
-            <div class="logo">AI</div>
-            <div>
-                <h1>AI Image Studio</h1>
-                <div class="subtitle">Generate, save, and manage beautiful AI images</div>
-            </div>
-        </div>
-    </header>
-    <div id="userSection">
-        <div id="mainPages">
-            <div id="homePage">
-                <div class="card">
-                    <form id="imageForm">
-                        <div class="form-group">
-                            <label for="prompt">Describe the image you want to generate:</label>
-                            <textarea
-                                id="prompt"
-                                name="prompt"
-                                class="prompt-input"
-                                placeholder="A majestic mountain landscape at sunset with vibrant colors..."
-                                required
-                            ></textarea>
-                        </div>
-                        <button type="submit" id="generateBtn" class="generate-btn">
-                            <div class="loading-spinner"></div>
-                            <span id="btnText">Generate Image</span>
-                        </button>
-                        <div class="progress-bar" id="progressBar" style="display:none; margin-top:12px; height:8px; background:rgba(255,255,255,0.03); border-radius:6px; overflow:hidden;">
-                            <div class="progress-fill" id="progressFill" style="background:linear-gradient(90deg,#ff7b2f,#9a5bff); width:0%; height:100%;"></div>
-                        </div>
-                    </form>
-                    <div id="status" class="status" style="display:none; margin-top:12px;"></div>
-                    <div id="resultSection" class="result-section" style="margin-top:12px; display:none;">
-                        <img id="generatedImage" class="generated-image" alt="Generated image" style="width:100%; border-radius:10px;" />
-                        <button id="downloadBtn" class="download-btn" style="margin-top:10px;">Download Image</button>
-                    </div>
-                </div>
-            </div>
-            <div id="historyPage" style="display:none;">
-                <div class="card">
-                    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h2 style="margin:0; color:#a259ff;">🖼️ Your Image History</h2>
-                        <div class="history-controls" style="display:flex; gap:12px; align-items:center;">
-                            <div class="search-box" style="position:relative;">
-                                <input type="text" id="imageSearch" placeholder="Search prompts..."
-                                       style="padding-left: 32px; width: 200px;">
-                                <span style="position:absolute; left:10px; top:50%; transform:translateY(-50%);">🔍</span>
+                </header>
+                <main class="chat-container">
+                    <div class="messages" id="messages" role="log" aria-live="polite" aria-label="Chat messages">
+                        <div class="message assistant" id="thinking-indicator" style="display: none;">
+                            <div class="message-content">
+                                <div class="typing-indicator">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
                             </div>
-                            <select id="sortImages" style="padding:8px; border-radius:8px; background:rgba(255,255,255,0.05); color:#fff; border:1px solid rgba(255,255,255,0.1);">
-                                <option value="newest">Newest First</option>
-                                <option value="oldest">Oldest First</option>
-                                <option value="favorites">Favorites</option>
-                            </select>
                         </div>
                     </div>
-                    <div id="historyList" style="margin-top:12px;"></div>
-                </div>
+                    <footer class="input-container">
+                        <div class="input-row">
+                            <button id="mic-button" class="btn-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line>
+                                </svg>
+                            </button>
+                            <div class="input-wrapper">
+                                <textarea 
+                                    class="message-input" 
+                                    id="messageInput" 
+                                    placeholder="Type your message..."
+                                    rows="1"
+                                    aria-label="Message input"
+                                    maxlength="4000"
+                                ></textarea>
+                            </div>
+                            <button class="send-button" id="sendButton" aria-label="Send message">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9"></polygon>
+                                </svg>
+                            </button>
+                        </div>
+                    </footer>
+                </main>
             </div>
-            <div id="accountPage" style="display:none;">
-                <div class="card">
-                    <h2 style="margin:0 0 8px 0; color:#ff9b45;">⚙️ Account Settings</h2>
-                    <div id="accountInfo" style="margin-top:12px;"></div>
-                </div>
+
+            <!-- HISTORY VIEW -->
+            <div id="history-container" class="history-container hidden">
+                <header class="header">
+                    <div class="header-content">
+                        <h1>Chat History</h1>
+                    </div>
+                </header>
+                <main class="history-content">
+                    <ul id="history-list" class="history-list">
+                        <!-- History items will be populated here -->
+                    </ul>
+                </main>
+            </div>
+
+            <!-- SETTINGS VIEW -->
+            <div id="settings-container" class="settings-container hidden">
+                <header class="header">
+                    <div class="header-content">
+                        <button id="back-button" class="btn-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline>
+                            </svg>
+                        </button>
+                        <h1>Settings</h1>
+                    </div>
+                </header>
+                <main class="settings-content">
+                    <div class="settings-section">
+                        <h3>Account</h3>
+                        <button id="logout-button" class="btn btn-danger">Logout</button>
+                    </div>
+                    <div class="settings-section">
+                        <h3>Theme</h3>
+                        <p>Theme selection coming soon!</p>
+                    </div>
+                </main>
+            </div>
+            
+            <!-- IMAGEN VIEW -->
+            <div id="imagen-container" class="imagen-container hidden">
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal-overlay" onclick="if(event.target === this) closeImageModal()">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeImageModal()">×</button>
+            <img id="modalImage" class="modal-image" alt="Full size image">
+            <div class="modal-controls">
+                <button class="modal-button download-btn" onclick="downloadModalImage()">
+                    <span>⬇️</span>Download Image
+                </button>
             </div>
         </div>
     </div>
 
+        <header class="app-header">
+            <div class="brand">
+                <div class="logo">AI</div>
+                <div>
+                    <h1>AI Image Studio</h1>
+                    <div class="subtitle">Generate, save, and manage beautiful AI images</div>
+                </div>
+            </div>
+        </header>
+        <div id="userSection">
+            <div id="mainPages">
+                <div id="homePage">
+                    <div class="card">
+                        <form id="imageForm">
+                            <div class="form-group">
+                                <label for="prompt">Describe the image you want to generate:</label>
+                                <textarea
+                                    id="prompt"
+                                    name="prompt"
+                                    class="prompt-input"
+                                    placeholder="A majestic mountain landscape at sunset with vibrant colors..."
+                                    required
+                                ></textarea>
+                            </div>
+                            <button type="submit" id="generateBtn" class="generate-btn">
+                                <div class="loading-spinner"></div>
+                                <span id="btnText">Generate Image</span>
+                            </button>
+                            <div class="progress-bar" id="progressBar" style="display:none; margin-top:12px; height:8px; background:rgba(255,255,255,0.03); border-radius:6px; overflow:hidden;">
+                                <div class="progress-fill" id="progressFill" style="background:linear-gradient(90deg,#ff7b2f,#9a5bff); width:0%; height:100%;"></div>
+                            </div>
+                        </form>
+                        <div id="status" class="status" style="display:none; margin-top:12px;"></div>
+                        <div id="resultSection" class="result-.section" style="margin-top:12px; display:none;">
+                            <img id="generatedImage" class="generated-image" alt="Generated image" style="width:100%; border-radius:10px;" />
+                            <button id="downloadBtn" class="download-btn" style="margin-top:10px;">Download Image</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="historyPage" style="display:none;">
+                    <div class="card">
+                        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h2 style="margin:0; color:#a259ff;">🖼️ Your Image History</h2>
+                            <div class="history-controls" style="display:flex; gap:12px; align-items:center;">
+                                <div class="search-box" style="position:relative;">
+                                    <input type="text" id="imageSearch" placeholder="Search prompts..."
+                                           style="padding-left: 32px; width: 200px;">
+                                    <span style="position:absolute; left:10px; top:50%; transform:translateY(-50%);">🔍</span>
+                                </div>
+                                <select id="sortImages" style="padding:8px; border-radius:8px; background:rgba(255,255,255,0.05); color:#fff; border:1px solid rgba(255,255,255,0.1);">
+                                    <option value="newest">Newest First</option>
+                                    <option value="oldest">Oldest First</option>
+                                    <option value="favorites">Favorites</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="historyList" style="margin-top:12px;"></div>
+                    </div>
+                </div>
+                <div id="accountPage" style="display:none;">
+                    <div class="card">
+                        <h2 style="margin:0 0 8px 0; color:#ff9b45;">⚙️ Account Settings</h2>
+                        <div id="accountInfo" style="margin-top:12px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        </div>
+
+        <!-- BOTTOM NAVIGATION -->
         <nav class="bottom-nav">
             <a href="#" id="nav-chat" class="nav-item active">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

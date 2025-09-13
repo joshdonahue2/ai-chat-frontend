@@ -56,6 +56,7 @@ export const ui = {
         this.elements.progressFill = document.getElementById('progressFill');
         this.elements.imagenHistoryPage = document.getElementById('historyPage');
         this.elements.imagenHistoryList = document.getElementById('historyList');
+        this.elements.mainContent = document.querySelector('.main-content');
 
         Object.entries(this.elements).forEach(([key, element]) => {
             console.log(`${key}: ${element ? 'FOUND' : 'MISSING'}`);
@@ -84,17 +85,14 @@ export const ui = {
 
     forceShowAuthScreen() {
         this.elements.authContainer?.classList.remove('hidden');
+        this.elements.mainContent?.classList.add('hidden');
         this.elements.bottomNav?.classList.add('hidden');
-        this.screenElements.forEach(key => {
-            if (key !== 'authContainer') {
-                this.elements[key]?.classList.add('hidden');
-            }
-        });
         this.elements.loadingContainer?.classList.add('hidden');
     },
 
     forceShowAppScreen() {
         this.elements.authContainer?.classList.add('hidden');
+        this.elements.mainContent?.classList.remove('hidden');
         this.elements.bottomNav?.classList.remove('hidden');
         this.elements.loadingContainer?.classList.add('hidden');
         this.showScreen('appContainer');
