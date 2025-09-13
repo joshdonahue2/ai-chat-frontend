@@ -22,7 +22,7 @@ const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || 'https://n8n.donahuenet.x
 
 // Supabase client setup
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_KEY;
+const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // User registration endpoint
