@@ -4,7 +4,7 @@ This document provides a comprehensive guide for developers and AI agents workin
 
 ## Project Overview
 
-This project is the frontend for a web-based AI chat application. It features user authentication through Supabase and real-time interaction with an AI through a webhook. The entire application is designed for containerized deployment using Docker and Nginx.
+This project is the frontend for a web-based AI chat application. It features user authentication through Supabase and real-time interaction with an AI through a webhook. The application also includes an "Imagen" feature for generating images from text prompts. The entire application is designed for containerized deployment using Docker and Nginx.
 
 ## Repository Structure
 
@@ -64,6 +64,7 @@ The development workflow is centered around Docker. There is no local developmen
 - **Dependencies**: Frontend dependencies are managed in `html/package.json`. They are installed as part of the Docker build process defined in the `Dockerfile`.
 - **Build Process**: The build process is defined in `build.sh`. It uses `esbuild` to bundle all JavaScript modules from `html/src/` into `html/public/js/bundle.js`. Environment variables are injected during this process. The `ESBUILD_PATH` variable in this script has been corrected to point to the correct location within the `html` directory.
 - **UI Elements**: The application has been redesigned with a new "cyber" theme. This includes a new header, a bottom navigation bar, and user/assistant avatars. A settings page has been added, accessible via the gear icon in the header. The settings page contains a "Logout" button and a "Back" button to return to the chat view. The other new UI elements (mic, nav buttons) have placeholder event listeners in `app.js` that log to the console when clicked.
+- **Imagen Feature**: The "Imagen" feature allows users to generate images from text prompts. The UI for this feature is in `html/public/index.html` within the `imagen-container` div. The logic for handling image generation is in `html/src/app.js`, specifically in the `handleImageGeneration`, `pollForImageResult`, and related functions.
 - **API Communication**: The logic for communicating with the AI backend and Supabase is in `html/src/api.js`.
 - **Project Goals**: The high-level goals of the project are documented in `project_goals.md`.
 - **Tech Stack**: The technologies used in this project are listed in `tech_stack.md`.

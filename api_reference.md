@@ -1,6 +1,6 @@
 # API Reference
 
-This document provides a reference for the APIs used by the AI Chat Agent frontend. The application communicates with two main services: a **Supabase Backend** for user authentication and data, and an **AI Webhook** for processing chat messages.
+This document provides a reference for the APIs used by the AI Chat Agent frontend. The application communicates with three main services: a **Supabase Backend** for user authentication and data, an **AI Webhook** for processing chat messages, and an **Imagen Service** for generating images.
 
 ---
 
@@ -41,6 +41,53 @@ The response body is a JSON object containing the AI's response.
 ```json
 {
   "response": "I'm not equipped to check the weather, but I can help you with other things!"
+}
+```
+
+---
+
+## Imagen Service
+
+The Imagen service is used to generate images from text prompts.
+
+### `POST {IMAGE_URL}`
+
+This endpoint is used to submit a request for image generation.
+
+**Request Body:**
+
+```json
+{
+  "prompt": "A beautiful landscape painting"
+}
+```
+
+**Response Body:**
+
+```json
+{
+  "taskId": "task-12345"
+}
+```
+
+### `GET {CALLBACK_BASE_URL}/status/{taskId}`
+
+This endpoint is used to poll for the status of an image generation task.
+
+**Response Body (In-progress):**
+
+```json
+{
+  "status": "processing"
+}
+```
+
+**Response Body (Completed):**
+
+```json
+{
+  "status": "completed",
+  "imageData": "<base64-encoded-image>"
 }
 ```
 

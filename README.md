@@ -8,6 +8,7 @@ This is the frontend for an AI chat application with long-term memory capabiliti
 *   **User Authentication:** Secure sign-up and sign-in functionality using Supabase Auth.
 *   **Real-time Chat Interface:** A responsive chat interface with user and assistant avatars.
 *   **AI Assistant Integration:** Seamlessly connects to a webhook endpoint for processing and responding to user messages.
+*   **Image Generation:** An "Imagen" feature that allows users to generate images based on text prompts.
 *   **Long-term Memory:** The AI assistant can remember previous conversations, providing a more personalized experience.
 *   **Containerized Deployment:** The application is fully containerized using Docker and Docker Compose for easy setup and deployment.
 
@@ -44,6 +45,8 @@ To get the application up and running locally, follow these steps:
     *   `SUPABASE_URL`: Your Supabase project URL.
     *   `SUPABASE_ANON_KEY`: Your Supabase anonymous key.
     *   `WEBHOOK_URL`: The URL of your AI assistant's webhook.
+    *   `IMAGE_URL`: The URL for the image generation webhook.
+    *   `CALLBACK_BASE_URL`: The base URL for image generation callbacks.
     *   `PORT`: The port on which the frontend container will be accessible (e.g., `3000`).
 
 4.  **Build and run the application:**
@@ -67,6 +70,8 @@ The following environment variables are required for the application to run:
 | `SUPABASE_URL`      | The URL of your Supabase project.                          |
 | `SUPABASE_ANON_KEY` | The anonymous (public) key for your Supabase project.      |
 | `WEBHOOK_URL`       | The URL of the webhook for the AI assistant.               |
+| `IMAGE_URL`         | The URL of the webhook for the image generation service.   |
+| `CALLBACK_BASE_URL` | The base URL for image generation callbacks.               |
 | `PORT`              | The port to expose on the host machine for the frontend.   |
 
 ## Build Process

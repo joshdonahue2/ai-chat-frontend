@@ -6,5 +6,4 @@ export const state = {
     conversationId: `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     conversationHistory: [],
     pollInterval: null,
-    imagenUiLoaded: false,
 };
