@@ -3,6 +3,12 @@ import { state } from './state.js';
 export const ui = {
     elements: {},
 
+    screenElements: [
+        'appContainer',
+        'historyContainer',
+        'settingsContainer',
+    ],
+
     cacheElements() {
         console.log('=== CACHING ELEMENTS ===');
         this.elements.authContainer = document.getElementById('auth-container');
@@ -30,6 +36,8 @@ export const ui = {
         this.elements.settingsContainer = document.getElementById('settings-container');
         this.elements.backButton = document.getElementById('back-button');
         this.elements.logoutButton = document.getElementById('logout-button');
+        this.elements.historyContainer = document.getElementById('history-container');
+        this.elements.bottomNav = document.querySelector('.bottom-nav');
 
         Object.entries(this.elements).forEach(([key, element]) => {
             console.log(`${key}: ${element ? 'FOUND' : 'MISSING'}`);
@@ -37,50 +45,52 @@ export const ui = {
         console.log('=== END CACHING ===');
     },
 
+    showScreen(screenId) {
+        this.screenElements.forEach(key => {
+            const element = this.elements[key];
+            if (element) {
+                element.classList.add('hidden');
+            }
+        });
+
+        const screenToShow = this.elements[screenId];
+        if (screenToShow) {
+            screenToShow.classList.remove('hidden');
+        }
+
+        this.elements.navChat?.classList.toggle('active', screenId === 'appContainer');
+        this.elements.navHistory?.classList.toggle('active', screenId === 'historyContainer');
+        this.elements.navProfile?.classList.toggle('active', screenId === 'settingsContainer');
+    },
+
     forceShowAuthScreen() {
-        if (this.elements.authContainer) {
-            this.elements.authContainer.style.display = 'block';
-            this.elements.authContainer.classList.remove('hidden');
-        }
-        if (this.elements.appContainer) {
-            this.elements.appContainer.style.display = 'none';
-            this.elements.appContainer.classList.remove('show');
-        }
-        if (this.elements.loadingContainer) {
-            this.elements.loadingContainer.style.display = 'none';
-        }
+        this.elements.authContainer?.classList.remove('hidden');
+        this.elements.bottomNav?.classList.add('hidden');
+        this.screenElements.forEach(key => this.elements[key]?.classList.add('hidden'));
+        this.elements.loadingContainer?.classList.add('hidden');
     },
 
     forceShowAppScreen() {
-        if (this.elements.authContainer) {
-            this.elements.authContainer.style.display = 'none';
-            this.elements.authContainer.classList.add('hidden');
-        }
-        if (this.elements.appContainer) {
-            this.elements.appContainer.style.display = 'flex';
-            this.elements.appContainer.classList.add('show');
-        }
-        if (this.elements.loadingContainer) {
-            this.elements.loadingContainer.style.display = 'none';
-        }
+        this.elements.authContainer?.classList.add('hidden');
+        this.elements.bottomNav?.classList.remove('hidden');
+        this.elements.loadingContainer?.classList.add('hidden');
+        this.showScreen('appContainer');
     },
 
     showSettingsPage() {
-        if (this.elements.appContainer) {
-            this.elements.appContainer.style.display = 'none';
-        }
-        if (this.elements.settingsContainer) {
-            this.elements.settingsContainer.style.display = 'flex';
-        }
+        this.showScreen('settingsContainer');
     },
 
     hideSettingsPage() {
-        if (this.elements.settingsContainer) {
-            this.elements.settingsContainer.style.display = 'none';
-        }
-        if (this.elements.appContainer) {
-            this.elements.appContainer.style.display = 'flex';
-        }
+        this.showScreen('appContainer');
+    },
+    
+    showHistoryPage() {
+        this.showScreen('historyContainer');
+    },
+
+    hideHistoryPage() {
+        this.showScreen('appContainer');
     },
 
     addMessage(sender, content) {
@@ -111,11 +121,11 @@ export const ui = {
     },
 
     showLoading() {
-        if (this.elements.loadingContainer) this.elements.loadingContainer.style.display = 'flex';
+        this.elements.loadingContainer?.classList.remove('hidden');
     },
 
     hideLoading() {
-        if (this.elements.loadingContainer) this.elements.loadingContainer.style.display = 'none';
+        this.elements.loadingContainer?.classList.add('hidden');
     },
 
     setLoading(loading) {

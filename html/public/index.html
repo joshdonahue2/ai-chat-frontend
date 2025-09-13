@@ -50,7 +50,7 @@
             <p id="auth-toggle-link" class="auth-toggle">Need an account? Sign Up</p>
         </div>
 
-        <!-- MAIN CHAT APPLICATION VIEW -->
+        <!-- MAIN APPLICATION SCREENS -->
         <div id="app-container" class="app-container">
             <header class="header">
                 <div class="header-content">
@@ -62,23 +62,8 @@
                     </button>
                 </div>
             </header>
-            
             <main class="chat-container">
                 <div class="messages" id="messages" role="log" aria-live="polite" aria-label="Chat messages">
-                    <!--
-                        Message Structure Reminder:
-                        A message div will be added here dynamically.
-                        It will contain an avatar and the message content.
-                        Example:
-                        <div class="message assistant">
-                            <img src="path/to/assistant-avatar.png" alt="Assistant" class="avatar">
-                            <div class="message-content">Hello! How can I help you today?</div>
-                        </div>
-                        <div class="message user">
-                            <img src="path/to/user-avatar.png" alt="You" class="avatar">
-                            <div class="message-content">I have a question.</div>
-                        </div>
-                    -->
                     <div class="message assistant" id="thinking-indicator" style="display: none;">
                         <div class="message-content">
                             <div class="typing-indicator">
@@ -114,26 +99,18 @@
                     </div>
                 </footer>
             </main>
-            <nav class="bottom-nav">
-                <a href="#" id="nav-chat" class="nav-item active">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                    <span>Chat</span>
-                </a>
-                <a href="#" id="nav-history" class="nav-item">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 8v4l3 3"></path><path d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z"></path>
-                    </svg>
-                    <span>History</span>
-                </a>
-                <a href="#" id="nav-profile" class="nav-item">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                    <span>Profile</span>
-                </a>
-            </nav>
+        </div>
+
+        <!-- HISTORY VIEW -->
+        <div id="history-container" class="history-container" style="display: none;">
+            <header class="header">
+                <div class="header-content">
+                    <h1>Chat History</h1>
+                </div>
+            </header>
+            <main class="history-content">
+                <!-- Chat history will be populated here -->
+            </main>
         </div>
 
         <!-- SETTINGS VIEW -->
@@ -152,6 +129,27 @@
                 <button id="logout-button" class="btn btn-danger">Logout</button>
             </main>
         </div>
+        
+        <nav class="bottom-nav">
+            <a href="#" id="nav-chat" class="nav-item active">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>Chat</span>
+            </a>
+            <a href="#" id="nav-history" class="nav-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 8v4l3 3"></path><path d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z"></path>
+                </svg>
+                <span>History</span>
+            </a>
+            <a href="#" id="nav-profile" class="nav-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Profile</span>
+            </a>
+        </nav>
     </div>
 
     <!-- Toast notifications -->

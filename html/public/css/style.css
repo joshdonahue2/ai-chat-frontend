@@ -60,6 +60,15 @@ body {
     position: relative;
 }
 
+/* Screen Containers */
+.app-container, .history-container, .settings-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    min-height: 0;
+}
+
 /* Header */
 .header {
     background: transparent;
@@ -81,7 +90,7 @@ body {
     text-shadow: 0 0 5px var(--primary-color);
 }
 
-/* Chat Container */
+/* Chat Container Specifics */
 .chat-container {
     flex: 1;
     display: flex;
@@ -212,6 +221,17 @@ body {
     height: 24px;
 }
 
+/* History View */
+#history-container {
+    background-color: var(--background-color);
+}
+
+.history-content {
+    flex-grow: 1;
+    padding: var(--spacing-xl);
+    color: var(--text-primary);
+}
+
 /* Other styles from the original file that might be needed */
 .loading {
     position: absolute;
@@ -328,28 +348,10 @@ body {
     text-decoration: underline;
 }
 
-.app-container {
-    display: none;
-    flex-direction: column;
-    height: 100%;
-}
-
-.app-container.show {
-    display: flex;
-}
-
 /* Settings View */
 .settings-container {
-    display: none; /* Hidden by default */
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
     background-color: var(--background-color);
     color: var(--text-primary);
-}
-
-.settings-container.show {
-    display: flex;
 }
 
 .settings-content {
@@ -413,6 +415,11 @@ body {
     40% {
         transform: scale(1.0);
     }
+}
+
+/* Hide/Show classes */
+.hidden {
+    display: none;
 }
 
 /* Responsive Design */
