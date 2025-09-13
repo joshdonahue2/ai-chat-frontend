@@ -7,6 +7,7 @@ export const ui = {
         'appContainer',
         'historyContainer',
         'settingsContainer',
+        'imagenContainer',
     ],
 
     cacheElements() {
@@ -33,7 +34,9 @@ export const ui = {
         this.elements.navChat = document.getElementById('nav-chat');
         this.elements.navHistory = document.getElementById('nav-history');
         this.elements.navSettings = document.getElementById('nav-settings');
+        this.elements.navImagen = document.getElementById('nav-imagen');
         this.elements.settingsContainer = document.getElementById('settings-container');
+        this.elements.imagenContainer = document.getElementById('imagen-container');
         this.elements.backButton = document.getElementById('back-button');
         this.elements.logoutButton = document.getElementById('logout-button');
         this.elements.historyContainer = document.getElementById('history-container');
@@ -62,6 +65,7 @@ export const ui = {
         this.elements.navChat?.classList.toggle('active', screenId === 'appContainer');
         this.elements.navHistory?.classList.toggle('active', screenId === 'historyContainer');
         this.elements.navSettings?.classList.toggle('active', screenId === 'settingsContainer');
+        this.elements.navImagen?.classList.toggle('active', screenId === 'imagenContainer');
     },
 
     forceShowAuthScreen() {
