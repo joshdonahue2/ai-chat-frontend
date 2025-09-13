@@ -7,6 +7,7 @@ export const ui = {
         'appContainer',
         'historyContainer',
         'settingsContainer',
+        'imageGeneratorContainer',
     ],
 
     cacheElements() {
@@ -31,6 +32,7 @@ export const ui = {
         this.elements.sendButton = document.getElementById('sendButton');
         this.elements.thinkingIndicator = document.getElementById('thinking-indicator');
         this.elements.navChat = document.getElementById('nav-chat');
+        this.elements.navImage = document.getElementById('nav-image');
         this.elements.navHistory = document.getElementById('nav-history');
         this.elements.navSettings = document.getElementById('nav-settings');
         this.elements.settingsContainer = document.getElementById('settings-container');
@@ -39,6 +41,18 @@ export const ui = {
         this.elements.historyContainer = document.getElementById('history-container');
         this.elements.historyList = document.getElementById('history-list');
         this.elements.bottomNav = document.querySelector('.bottom-nav');
+
+        // Image generator elements
+        this.elements.imageGeneratorContainer = document.getElementById('image-generator-container');
+        this.elements.promptInput = document.getElementById('prompt');
+        this.elements.generateBtn = document.getElementById('generate-btn');
+        this.elements.status = document.getElementById('status');
+        this.elements.progressBar = document.querySelector('.progress-bar');
+        this.elements.progressFill = document.querySelector('.progress-fill');
+        this.elements.resultSection = document.getElementById('result-section');
+        this.elements.generatedImage = document.getElementById('generated-image');
+        this.elements.downloadBtn = document.getElementById('download-btn');
+
 
         Object.entries(this.elements).forEach(([key, element]) => {
             console.log(`${key}: ${element ? 'FOUND' : 'MISSING'}`);
@@ -60,6 +74,7 @@ export const ui = {
         }
 
         this.elements.navChat?.classList.toggle('active', screenId === 'appContainer');
+        this.elements.navImage?.classList.toggle('active', screenId === 'imageGeneratorContainer');
         this.elements.navHistory?.classList.toggle('active', screenId === 'historyContainer');
         this.elements.navSettings?.classList.toggle('active', screenId === 'settingsContainer');
     },

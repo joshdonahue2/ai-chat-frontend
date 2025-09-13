@@ -2,6 +2,7 @@ import { api } from './api.js';
 import { auth } from './auth.js';
 import { ui } from './ui.js';
 import { state } from './state.js';
+import { initImageGenerator } from './image-generator.js';
 
 function getDisplayName(user, profile) {
     return profile?.full_name?.trim() || user.user_metadata?.full_name?.trim() || user.email;
@@ -102,6 +103,8 @@ function bindEvents() {
     ui.elements.navSettings?.addEventListener('click', () => ui.showScreen('settingsContainer'));
 
     ui.elements.micButton?.addEventListener('click', () => console.log('Mic button clicked'));
+
+    initImageGenerator();
 
     console.log('Events bound successfully');
 }
