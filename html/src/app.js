@@ -95,10 +95,7 @@ function bindEvents() {
     ui.elements.backButton?.addEventListener('click', () => ui.showScreen('appContainer'));
     ui.elements.settingsButton?.addEventListener('click', () => ui.showScreen('settingsContainer'));
     ui.elements.navChat?.addEventListener('click', () => ui.showScreen('appContainer'));
-    ui.elements.navImagen?.addEventListener('click', () => {
-        ui.showScreen('imagenContainer');
-        loadImagenUI();
-    });
+    ui.elements.navImagen?.addEventListener('click', () => ui.showScreen('imagenContainer'));
     ui.elements.navHistory?.addEventListener('click', () => {
         ui.showScreen('historyContainer');
         loadHistory();
@@ -253,21 +250,6 @@ function showImagenProgress(percentage) {
 function hideImagenProgress() {
     ui.elements.progressBar.style.display = 'none';
     ui.elements.progressFill.style.width = '0%';
-}
-
-async function loadImagenUI() {
-    if (state.imagenUiLoaded) return;
-    try {
-        const response = await fetch('imagen.html');
-        const html = await response.text();
-        ui.elements.imagenContainer.innerHTML = html;
-        ui.cacheElements();
-        ui.elements.imageForm?.addEventListener('submit', (e) => handleImageGeneration(e));
-        state.imagenUiLoaded = true;
-    } catch (error) {
-        console.error('Failed to load Imagen UI:', error);
-        ui.elements.imagenContainer.innerHTML = '<p>Error loading image generation feature.</p>';
-    }
 }
 
 async function init() {

@@ -33,7 +33,7 @@
   ));
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // html/node_modules/@supabase/node-fetch/browser.js
+  // node_modules/@supabase/node-fetch/browser.js
   var browser_exports = {};
   __export(browser_exports, {
     Headers: () => Headers2,
@@ -44,7 +44,7 @@
   });
   var getGlobal, globalObject, fetch2, browser_default, Headers2, Request, Response2;
   var init_browser = __esm({
-    "html/node_modules/@supabase/node-fetch/browser.js"() {
+    "node_modules/@supabase/node-fetch/browser.js"() {
       "use strict";
       getGlobal = function() {
         if (typeof self !== "undefined") {
@@ -67,9 +67,9 @@
     }
   });
 
-  // html/node_modules/@supabase/postgrest-js/dist/cjs/PostgrestError.js
+  // node_modules/@supabase/postgrest-js/dist/cjs/PostgrestError.js
   var require_PostgrestError = __commonJS({
-    "html/node_modules/@supabase/postgrest-js/dist/cjs/PostgrestError.js"(exports) {
+    "node_modules/@supabase/postgrest-js/dist/cjs/PostgrestError.js"(exports) {
       "use strict";
       Object.defineProperty(exports, "__esModule", { value: true });
       var PostgrestError2 = class extends Error {
@@ -85,9 +85,9 @@
     }
   });
 
-  // html/node_modules/@supabase/postgrest-js/dist/cjs/PostgrestBuilder.js
+  // node_modules/@supabase/postgrest-js/dist/cjs/PostgrestBuilder.js
   var require_PostgrestBuilder = __commonJS({
-    "html/node_modules/@supabase/postgrest-js/dist/cjs/PostgrestBuilder.js"(exports) {
+    "node_modules/@supabase/postgrest-js/dist/cjs/PostgrestBuilder.js"(exports) {
       "use strict";
       var __importDefault = exports && exports.__importDefault || function(mod) {
         return mod && mod.__esModule ? mod : { "default": mod };
@@ -288,9 +288,9 @@
     }
   });
 
-  // html/node_modules/@supabase/postgrest-js/dist/cjs/PostgrestTransformBuilder.js
+  // node_modules/@supabase/postgrest-js/dist/cjs/PostgrestTransformBuilder.js
   var require_PostgrestTransformBuilder = __commonJS({
-    "html/node_modules/@supabase/postgrest-js/dist/cjs/PostgrestTransformBuilder.js"(exports) {
+    "node_modules/@supabase/postgrest-js/dist/cjs/PostgrestTransformBuilder.js"(exports) {
       "use strict";
       var __importDefault = exports && exports.__importDefault || function(mod) {
         return mod && mod.__esModule ? mod : { "default": mod };
@@ -507,9 +507,9 @@
     }
   });
 
-  // html/node_modules/@supabase/postgrest-js/dist/cjs/PostgrestFilterBuilder.js
+  // node_modules/@supabase/postgrest-js/dist/cjs/PostgrestFilterBuilder.js
   var require_PostgrestFilterBuilder = __commonJS({
-    "html/node_modules/@supabase/postgrest-js/dist/cjs/PostgrestFilterBuilder.js"(exports) {
+    "node_modules/@supabase/postgrest-js/dist/cjs/PostgrestFilterBuilder.js"(exports) {
       "use strict";
       var __importDefault = exports && exports.__importDefault || function(mod) {
         return mod && mod.__esModule ? mod : { "default": mod };
@@ -873,9 +873,9 @@
     }
   });
 
-  // html/node_modules/@supabase/postgrest-js/dist/cjs/PostgrestQueryBuilder.js
+  // node_modules/@supabase/postgrest-js/dist/cjs/PostgrestQueryBuilder.js
   var require_PostgrestQueryBuilder = __commonJS({
-    "html/node_modules/@supabase/postgrest-js/dist/cjs/PostgrestQueryBuilder.js"(exports) {
+    "node_modules/@supabase/postgrest-js/dist/cjs/PostgrestQueryBuilder.js"(exports) {
       "use strict";
       var __importDefault = exports && exports.__importDefault || function(mod) {
         return mod && mod.__esModule ? mod : { "default": mod };
@@ -1125,9 +1125,9 @@
     }
   });
 
-  // html/node_modules/@supabase/postgrest-js/dist/cjs/PostgrestClient.js
+  // node_modules/@supabase/postgrest-js/dist/cjs/PostgrestClient.js
   var require_PostgrestClient = __commonJS({
-    "html/node_modules/@supabase/postgrest-js/dist/cjs/PostgrestClient.js"(exports) {
+    "node_modules/@supabase/postgrest-js/dist/cjs/PostgrestClient.js"(exports) {
       "use strict";
       var __importDefault = exports && exports.__importDefault || function(mod) {
         return mod && mod.__esModule ? mod : { "default": mod };
@@ -1234,9 +1234,9 @@
     }
   });
 
-  // html/node_modules/@supabase/postgrest-js/dist/cjs/index.js
+  // node_modules/@supabase/postgrest-js/dist/cjs/index.js
   var require_cjs = __commonJS({
-    "html/node_modules/@supabase/postgrest-js/dist/cjs/index.js"(exports) {
+    "node_modules/@supabase/postgrest-js/dist/cjs/index.js"(exports) {
       "use strict";
       var __importDefault = exports && exports.__importDefault || function(mod) {
         return mod && mod.__esModule ? mod : { "default": mod };
@@ -1266,7 +1266,7 @@
     }
   });
 
-  // html/node_modules/@supabase/functions-js/dist/module/helper.js
+  // node_modules/@supabase/functions-js/dist/module/helper.js
   var resolveFetch = (customFetch) => {
     let _fetch;
     if (customFetch) {
@@ -1279,7 +1279,7 @@
     return (...args) => _fetch(...args);
   };
 
-  // html/node_modules/@supabase/functions-js/dist/module/types.js
+  // node_modules/@supabase/functions-js/dist/module/types.js
   var FunctionsError = class extends Error {
     constructor(message, name = "FunctionsError", context) {
       super(message);
@@ -1321,7 +1321,7 @@
     FunctionRegion2["UsWest2"] = "us-west-2";
   })(FunctionRegion || (FunctionRegion = {}));
 
-  // html/node_modules/@supabase/functions-js/dist/module/FunctionsClient.js
+  // node_modules/@supabase/functions-js/dist/module/FunctionsClient.js
   var __awaiter = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve) {
@@ -1441,7 +1441,7 @@
     }
   };
 
-  // html/node_modules/@supabase/postgrest-js/dist/esm/wrapper.mjs
+  // node_modules/@supabase/postgrest-js/dist/esm/wrapper.mjs
   var import_cjs = __toESM(require_cjs(), 1);
   var {
     PostgrestClient,
@@ -1452,7 +1452,7 @@
     PostgrestError
   } = import_cjs.default;
 
-  // html/node_modules/@supabase/realtime-js/dist/module/lib/websocket-factory.js
+  // node_modules/@supabase/realtime-js/dist/module/lib/websocket-factory.js
   var WebSocketFactory = class {
     static detectEnvironment() {
       var _a;
@@ -1535,10 +1535,10 @@ Suggested solution: ${env.workaround}`;
   };
   var websocket_factory_default = WebSocketFactory;
 
-  // html/node_modules/@supabase/realtime-js/dist/module/lib/version.js
+  // node_modules/@supabase/realtime-js/dist/module/lib/version.js
   var version = "2.15.5";
 
-  // html/node_modules/@supabase/realtime-js/dist/module/lib/constants.js
+  // node_modules/@supabase/realtime-js/dist/module/lib/constants.js
   var DEFAULT_VERSION = `realtime-js/${version}`;
   var VSN = "1.0.0";
   var DEFAULT_TIMEOUT = 1e4;
@@ -1580,7 +1580,7 @@ Suggested solution: ${env.workaround}`;
     CONNECTION_STATE2["Closed"] = "closed";
   })(CONNECTION_STATE || (CONNECTION_STATE = {}));
 
-  // html/node_modules/@supabase/realtime-js/dist/module/lib/serializer.js
+  // node_modules/@supabase/realtime-js/dist/module/lib/serializer.js
   var Serializer = class {
     constructor() {
       this.HEADER_LENGTH = 1;
@@ -1612,7 +1612,7 @@ Suggested solution: ${env.workaround}`;
     }
   };
 
-  // html/node_modules/@supabase/realtime-js/dist/module/lib/timer.js
+  // node_modules/@supabase/realtime-js/dist/module/lib/timer.js
   var Timer = class {
     constructor(callback, timerCalc) {
       this.callback = callback;
@@ -1637,7 +1637,7 @@ Suggested solution: ${env.workaround}`;
     }
   };
 
-  // html/node_modules/@supabase/realtime-js/dist/module/lib/transformers.js
+  // node_modules/@supabase/realtime-js/dist/module/lib/transformers.js
   var PostgresTypes;
   (function(PostgresTypes2) {
     PostgresTypes2["abstime"] = "abstime";
@@ -1786,7 +1786,7 @@ Suggested solution: ${env.workaround}`;
     return url.replace(/\/+$/, "") + "/api/broadcast";
   };
 
-  // html/node_modules/@supabase/realtime-js/dist/module/lib/push.js
+  // node_modules/@supabase/realtime-js/dist/module/lib/push.js
   var Push = class {
     /**
      * Initializes the Push
@@ -1885,7 +1885,7 @@ Suggested solution: ${env.workaround}`;
     }
   };
 
-  // html/node_modules/@supabase/realtime-js/dist/module/RealtimePresence.js
+  // node_modules/@supabase/realtime-js/dist/module/RealtimePresence.js
   var REALTIME_PRESENCE_LISTEN_EVENTS;
   (function(REALTIME_PRESENCE_LISTEN_EVENTS2) {
     REALTIME_PRESENCE_LISTEN_EVENTS2["SYNC"] = "sync";
@@ -2109,7 +2109,7 @@ Suggested solution: ${env.workaround}`;
     }
   };
 
-  // html/node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.js
+  // node_modules/@supabase/realtime-js/dist/module/RealtimeChannel.js
   var REALTIME_POSTGRES_CHANGES_LISTEN_EVENT;
   (function(REALTIME_POSTGRES_CHANGES_LISTEN_EVENT2) {
     REALTIME_POSTGRES_CHANGES_LISTEN_EVENT2["ALL"] = "*";
@@ -2604,7 +2604,7 @@ Suggested solution: ${env.workaround}`;
     }
   };
 
-  // html/node_modules/@supabase/realtime-js/dist/module/RealtimeClient.js
+  // node_modules/@supabase/realtime-js/dist/module/RealtimeClient.js
   var noop2 = () => {
   };
   var CONNECTION_TIMEOUTS = {
@@ -3260,7 +3260,7 @@ Option 2: Install and provide the "ws" package:
     }
   };
 
-  // html/node_modules/@supabase/storage-js/dist/module/lib/errors.js
+  // node_modules/@supabase/storage-js/dist/module/lib/errors.js
   var StorageError = class extends Error {
     constructor(message) {
       super(message);
@@ -3295,7 +3295,7 @@ Option 2: Install and provide the "ws" package:
     }
   };
 
-  // html/node_modules/@supabase/storage-js/dist/module/lib/helpers.js
+  // node_modules/@supabase/storage-js/dist/module/lib/helpers.js
   var __awaiter2 = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve) {
@@ -3361,7 +3361,7 @@ Option 2: Install and provide the "ws" package:
     return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
   };
 
-  // html/node_modules/@supabase/storage-js/dist/module/lib/fetch.js
+  // node_modules/@supabase/storage-js/dist/module/lib/fetch.js
   var __awaiter3 = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve) {
@@ -3459,7 +3459,7 @@ Option 2: Install and provide the "ws" package:
     });
   }
 
-  // html/node_modules/@supabase/storage-js/dist/module/packages/StorageFileApi.js
+  // node_modules/@supabase/storage-js/dist/module/packages/StorageFileApi.js
   var __awaiter4 = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve) {
@@ -4050,13 +4050,13 @@ Option 2: Install and provide the "ws" package:
     }
   };
 
-  // html/node_modules/@supabase/storage-js/dist/module/lib/version.js
+  // node_modules/@supabase/storage-js/dist/module/lib/version.js
   var version2 = "2.12.1";
 
-  // html/node_modules/@supabase/storage-js/dist/module/lib/constants.js
+  // node_modules/@supabase/storage-js/dist/module/lib/constants.js
   var DEFAULT_HEADERS = { "X-Client-Info": `storage-js/${version2}` };
 
-  // html/node_modules/@supabase/storage-js/dist/module/packages/StorageBucketApi.js
+  // node_modules/@supabase/storage-js/dist/module/packages/StorageBucketApi.js
   var __awaiter5 = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve) {
@@ -4264,7 +4264,7 @@ Option 2: Install and provide the "ws" package:
     }
   };
 
-  // html/node_modules/@supabase/storage-js/dist/module/StorageClient.js
+  // node_modules/@supabase/storage-js/dist/module/StorageClient.js
   var StorageClient = class extends StorageBucketApi {
     constructor(url, headers = {}, fetch3, opts) {
       super(url, headers, fetch3, opts);
@@ -4279,10 +4279,10 @@ Option 2: Install and provide the "ws" package:
     }
   };
 
-  // html/node_modules/@supabase/supabase-js/dist/module/lib/version.js
+  // node_modules/@supabase/supabase-js/dist/module/lib/version.js
   var version3 = "2.57.4";
 
-  // html/node_modules/@supabase/supabase-js/dist/module/lib/constants.js
+  // node_modules/@supabase/supabase-js/dist/module/lib/constants.js
   var JS_ENV = "";
   if (typeof Deno !== "undefined") {
     JS_ENV = "deno";
@@ -4308,7 +4308,7 @@ Option 2: Install and provide the "ws" package:
   };
   var DEFAULT_REALTIME_OPTIONS = {};
 
-  // html/node_modules/@supabase/supabase-js/dist/module/lib/fetch.js
+  // node_modules/@supabase/supabase-js/dist/module/lib/fetch.js
   init_browser();
   var __awaiter6 = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
@@ -4371,7 +4371,7 @@ Option 2: Install and provide the "ws" package:
     });
   };
 
-  // html/node_modules/@supabase/supabase-js/dist/module/lib/helpers.js
+  // node_modules/@supabase/supabase-js/dist/module/lib/helpers.js
   var __awaiter7 = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve) {
@@ -4438,10 +4438,10 @@ Option 2: Install and provide the "ws" package:
     }
   }
 
-  // html/node_modules/@supabase/auth-js/dist/module/lib/version.js
+  // node_modules/@supabase/auth-js/dist/module/lib/version.js
   var version4 = "2.71.1";
 
-  // html/node_modules/@supabase/auth-js/dist/module/lib/constants.js
+  // node_modules/@supabase/auth-js/dist/module/lib/constants.js
   var AUTO_REFRESH_TICK_DURATION_MS = 30 * 1e3;
   var AUTO_REFRESH_TICK_THRESHOLD = 3;
   var EXPIRY_MARGIN_MS = AUTO_REFRESH_TICK_THRESHOLD * AUTO_REFRESH_TICK_DURATION_MS;
@@ -4458,7 +4458,7 @@ Option 2: Install and provide the "ws" package:
   var BASE64URL_REGEX = /^([a-z0-9_-]{4})*($|[a-z0-9_-]{3}$|[a-z0-9_-]{2}$)$/i;
   var JWKS_TTL = 10 * 60 * 1e3;
 
-  // html/node_modules/@supabase/auth-js/dist/module/lib/errors.js
+  // node_modules/@supabase/auth-js/dist/module/lib/errors.js
   var AuthError = class extends Error {
     constructor(message, status, code) {
       super(message);
@@ -4567,7 +4567,7 @@ Option 2: Install and provide the "ws" package:
     }
   };
 
-  // html/node_modules/@supabase/auth-js/dist/module/lib/base64url.js
+  // node_modules/@supabase/auth-js/dist/module/lib/base64url.js
   var TO_BASE64URL = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_".split("");
   var IGNORE_BASE64URL = " 	\n\r=".split("");
   var FROM_BASE64URL = (() => {
@@ -4729,7 +4729,7 @@ Option 2: Install and provide the "ws" package:
     return result.join("");
   }
 
-  // html/node_modules/@supabase/auth-js/dist/module/lib/helpers.js
+  // node_modules/@supabase/auth-js/dist/module/lib/helpers.js
   function expiresAt(expiresIn) {
     const timeNow = Math.round(Date.now() / 1e3);
     return timeNow + expiresIn;
@@ -4999,7 +4999,7 @@ Option 2: Install and provide the "ws" package:
     return JSON.parse(JSON.stringify(obj));
   }
 
-  // html/node_modules/@supabase/auth-js/dist/module/lib/fetch.js
+  // node_modules/@supabase/auth-js/dist/module/lib/fetch.js
   var __rest = function(s, e) {
     var t = {};
     for (var p in s)
@@ -5148,10 +5148,10 @@ Option 2: Install and provide the "ws" package:
     return data.access_token && data.refresh_token && data.expires_in;
   }
 
-  // html/node_modules/@supabase/auth-js/dist/module/lib/types.js
+  // node_modules/@supabase/auth-js/dist/module/lib/types.js
   var SIGN_OUT_SCOPES = ["global", "local", "others"];
 
-  // html/node_modules/@supabase/auth-js/dist/module/GoTrueAdminApi.js
+  // node_modules/@supabase/auth-js/dist/module/GoTrueAdminApi.js
   var __rest2 = function(s, e) {
     var t = {};
     for (var p in s)
@@ -5413,7 +5413,7 @@ Option 2: Install and provide the "ws" package:
     }
   };
 
-  // html/node_modules/@supabase/auth-js/dist/module/lib/local-storage.js
+  // node_modules/@supabase/auth-js/dist/module/lib/local-storage.js
   function memoryLocalStorageAdapter(store = {}) {
     return {
       getItem: (key) => {
@@ -5428,7 +5428,7 @@ Option 2: Install and provide the "ws" package:
     };
   }
 
-  // html/node_modules/@supabase/auth-js/dist/module/lib/polyfills.js
+  // node_modules/@supabase/auth-js/dist/module/lib/polyfills.js
   function polyfillGlobalThis() {
     if (typeof globalThis === "object")
       return;
@@ -5448,7 +5448,7 @@ Option 2: Install and provide the "ws" package:
     }
   }
 
-  // html/node_modules/@supabase/auth-js/dist/module/lib/locks.js
+  // node_modules/@supabase/auth-js/dist/module/lib/locks.js
   var internals = {
     /**
      * @experimental
@@ -5516,7 +5516,7 @@ Option 2: Install and provide the "ws" package:
     }));
   }
 
-  // html/node_modules/@supabase/auth-js/dist/module/GoTrueClient.js
+  // node_modules/@supabase/auth-js/dist/module/GoTrueClient.js
   polyfillGlobalThis();
   var DEFAULT_OPTIONS = {
     url: GOTRUE_URL,
@@ -7623,18 +7623,18 @@ Option 2: Install and provide the "ws" package:
   };
   GoTrueClient.nextInstanceID = 0;
 
-  // html/node_modules/@supabase/auth-js/dist/module/AuthClient.js
+  // node_modules/@supabase/auth-js/dist/module/AuthClient.js
   var AuthClient = GoTrueClient;
   var AuthClient_default = AuthClient;
 
-  // html/node_modules/@supabase/supabase-js/dist/module/lib/SupabaseAuthClient.js
+  // node_modules/@supabase/supabase-js/dist/module/lib/SupabaseAuthClient.js
   var SupabaseAuthClient = class extends AuthClient_default {
     constructor(options) {
       super(options);
     }
   };
 
-  // html/node_modules/@supabase/supabase-js/dist/module/SupabaseClient.js
+  // node_modules/@supabase/supabase-js/dist/module/SupabaseClient.js
   var __awaiter8 = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve) {
@@ -7860,7 +7860,7 @@ Option 2: Install and provide the "ws" package:
     }
   };
 
-  // html/node_modules/@supabase/supabase-js/dist/module/index.js
+  // node_modules/@supabase/supabase-js/dist/module/index.js
   var createClient = (supabaseUrl, supabaseKey, options) => {
     return new SupabaseClient(supabaseUrl, supabaseKey, options);
   };
@@ -7886,23 +7886,25 @@ Option 2: Install and provide the "ws" package:
     console.warn(`\u26A0\uFE0F  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217`);
   }
 
-  // html/src/state.js
+  // src/state.js
   var state = {
     isLoading: false,
     isInitialized: false,
     isSignUpMode: false,
     userId: null,
     conversationId: `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    conversationHistory: []
+    conversationHistory: [],
+    pollInterval: null
   };
 
-  // html/src/ui.js
+  // src/ui.js
   var ui = {
     elements: {},
     screenElements: [
       "appContainer",
       "historyContainer",
-      "settingsContainer"
+      "settingsContainer",
+      "imagenContainer"
     ],
     cacheElements() {
       console.log("=== CACHING ELEMENTS ===");
@@ -7934,6 +7936,22 @@ Option 2: Install and provide the "ws" package:
       this.elements.historyContainer = document.getElementById("history-container");
       this.elements.historyList = document.getElementById("history-list");
       this.elements.bottomNav = document.querySelector(".bottom-nav");
+      this.elements.navImagen = document.getElementById("nav-imagen");
+      this.elements.imagenContainer = document.getElementById("imagen-container");
+      this.elements.imageModal = document.getElementById("imageModal");
+      this.elements.modalImage = document.getElementById("modalImage");
+      this.elements.imageForm = document.getElementById("imageForm");
+      this.elements.generateBtn = document.getElementById("generateBtn");
+      this.elements.btnText = document.getElementById("btnText");
+      this.elements.loadingSpinner = document.querySelector(".loading-spinner");
+      this.elements.status = document.getElementById("status");
+      this.elements.resultSection = document.getElementById("resultSection");
+      this.elements.generatedImage = document.getElementById("generatedImage");
+      this.elements.downloadBtn = document.getElementById("downloadBtn");
+      this.elements.progressBar = document.getElementById("progressBar");
+      this.elements.progressFill = document.getElementById("progressFill");
+      this.elements.imagenHistoryPage = document.getElementById("historyPage");
+      this.elements.imagenHistoryList = document.getElementById("historyList");
       Object.entries(this.elements).forEach(([key, element]) => {
         console.log(`${key}: ${element ? "FOUND" : "MISSING"}`);
       });
@@ -7951,13 +7969,18 @@ Option 2: Install and provide the "ws" package:
         screenToShow.classList.remove("hidden");
       }
       this.elements.navChat?.classList.toggle("active", screenId === "appContainer");
+      this.elements.navImagen?.classList.toggle("active", screenId === "imagenContainer");
       this.elements.navHistory?.classList.toggle("active", screenId === "historyContainer");
       this.elements.navSettings?.classList.toggle("active", screenId === "settingsContainer");
     },
     forceShowAuthScreen() {
       this.elements.authContainer?.classList.remove("hidden");
       this.elements.bottomNav?.classList.add("hidden");
-      this.screenElements.forEach((key) => this.elements[key]?.classList.add("hidden"));
+      this.screenElements.forEach((key) => {
+        if (key !== "authContainer") {
+          this.elements[key]?.classList.add("hidden");
+        }
+      });
       this.elements.loadingContainer?.classList.add("hidden");
     },
     forceShowAppScreen() {
@@ -8049,11 +8072,11 @@ Option 2: Install and provide the "ws" package:
     }
   };
 
-  // html/src/api.js
+  // src/api.js
   var config = {
-    supabaseUrl: "YOUR_SUPABASE_URL",
-    supabaseAnonKey: "SUPABASE_ANON_KEY",
-    webhookUrl: "MEMORY_AGENT_WEBHOOK_URL"
+    supabaseUrl: "",
+    supabaseAnonKey: "",
+    webhookUrl: ""
   };
   var supabase;
   var api = {
@@ -8117,10 +8140,33 @@ Option 2: Install and provide the "ws" package:
         { role: "user", content: "This is another message from the past." },
         { role: "assistant", content: "And this is another response." }
       ]);
+    },
+    async generateImage(prompt) {
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({ prompt })
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to start image generation");
+      }
+      return response.json();
+    },
+    async getImageStatus(taskId) {
+      const response = await fetch(`/api/status/${taskId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      return response.json();
     }
   };
 
-  // html/src/auth.js
+  // src/auth.js
   var auth = {
     async handleAuthSubmit(e) {
       e.preventDefault();
@@ -8214,7 +8260,7 @@ Option 2: Install and provide the "ws" package:
     }
   };
 
-  // html/src/app.js
+  // src/app.js
   function getDisplayName(user, profile) {
     return profile?.full_name?.trim() || user.user_metadata?.full_name?.trim() || user.email;
   }
@@ -8294,13 +8340,141 @@ Option 2: Install and provide the "ws" package:
     ui.elements.backButton?.addEventListener("click", () => ui.showScreen("appContainer"));
     ui.elements.settingsButton?.addEventListener("click", () => ui.showScreen("settingsContainer"));
     ui.elements.navChat?.addEventListener("click", () => ui.showScreen("appContainer"));
+    ui.elements.navImagen?.addEventListener("click", () => ui.showScreen("imagenContainer"));
     ui.elements.navHistory?.addEventListener("click", () => {
       ui.showScreen("historyContainer");
       loadHistory();
     });
     ui.elements.navSettings?.addEventListener("click", () => ui.showScreen("settingsContainer"));
     ui.elements.micButton?.addEventListener("click", () => console.log("Mic button clicked"));
+    ui.elements.imageForm?.addEventListener("submit", (e) => handleImageGeneration(e));
     console.log("Events bound successfully");
+  }
+  async function handleImageGeneration(e) {
+    e.preventDefault();
+    const prompt = ui.elements.imageForm.prompt.value.trim();
+    if (!prompt)
+      return;
+    setImagenLoading(true);
+    hideImagenResult();
+    showImagenStatus("Sending your request to the AI...", "loading");
+    showImagenProgress(10);
+    try {
+      const data = await api.generateImage(prompt);
+      showImagenProgress(30);
+      showImagenStatus("Your image is being generated...", "loading");
+      await pollForImageResult(data.taskId);
+    } catch (error) {
+      console.error("Generation error:", error);
+      showImagenStatus(`Error: ${error.message}`, "error");
+    } finally {
+      setImagenLoading(false);
+      hideImagenProgress();
+    }
+  }
+  async function pollForImageResult(taskId) {
+    let attempts = 0;
+    const maxAttempts = 120;
+    let lastStatus = "pending";
+    const poll = async (resolve, reject) => {
+      attempts++;
+      if (attempts > maxAttempts) {
+        clearInterval(state.pollInterval);
+        showImagenStatus("Generation timed out after 10 minutes.", "error");
+        return reject(new Error("Generation timed out"));
+      }
+      try {
+        const data = await api.getImageStatus(taskId);
+        if (data.status !== lastStatus) {
+          lastStatus = data.status;
+          updateImagenStatusMessage(data.status, attempts);
+        }
+        if (data.status === "completed" && data.imageData) {
+          clearInterval(state.pollInterval);
+          showImagenProgress(100);
+          await displayImagenResult(data.imageData);
+          resolve();
+        } else if (data.status === "error") {
+          clearInterval(state.pollInterval);
+          showImagenStatus(`Generation failed: ${data.error || "Unknown error"}`, "error");
+          reject(new Error(data.error || "Unknown error"));
+        } else {
+          let progress = 30;
+          if (data.status === "processing") {
+            progress = Math.min(40 + attempts * 1, 85);
+          } else {
+            progress = Math.min(30 + attempts * 0.5, 70);
+          }
+          showImagenProgress(progress);
+          state.pollInterval = setTimeout(() => poll(resolve, reject), 5e3);
+        }
+      } catch (error) {
+        console.error("Polling error:", error);
+      }
+    };
+    return new Promise((resolve, reject) => {
+      state.pollInterval = setTimeout(() => poll(resolve, reject), 5e3);
+    });
+  }
+  function updateImagenStatusMessage(status, attempts) {
+    const elapsed = Math.floor(attempts * 5 / 60);
+    const minutes = elapsed > 0 ? ` (${elapsed}m elapsed)` : "";
+    switch (status) {
+      case "pending":
+        showImagenStatus(`Sending request to n8n...${minutes}`, "loading");
+        break;
+      case "processing":
+        showImagenStatus(`AI is generating your image...${minutes}`, "loading");
+        break;
+      default:
+        showImagenStatus(`Processing your request...${minutes}`, "loading");
+    }
+  }
+  async function displayImagenResult(base64Data) {
+    const existingImage = ui.elements.generatedImage;
+    try {
+      if (!base64Data || typeof base64Data !== "string") {
+        throw new Error("Invalid or missing base64 data.");
+      }
+      const imageUrl = `data:image/png;base64,${base64Data.replace(/\s/g, "")}`;
+      const preloader = new Image();
+      preloader.onload = () => {
+        existingImage.src = preloader.src;
+        showImagenResult();
+        showImagenStatus("Image generated successfully!", "success");
+      };
+      preloader.onerror = () => {
+        showImagenStatus("Error: The generated image data was corrupt.", "error");
+      };
+      preloader.src = imageUrl;
+    } catch (error) {
+      showImagenStatus(`Failed to display image: ${error.message}`, "error");
+    }
+  }
+  function hideImagenResult() {
+    ui.elements.resultSection.style.display = "none";
+    ui.elements.generatedImage.src = "";
+  }
+  function showImagenResult() {
+    ui.elements.resultSection.style.display = "block";
+  }
+  function setImagenLoading(loading) {
+    ui.elements.generateBtn.disabled = loading;
+    ui.elements.loadingSpinner.style.display = loading ? "inline-block" : "none";
+    ui.elements.btnText.textContent = loading ? "Generating..." : "Generate Image";
+  }
+  function showImagenStatus(message, type) {
+    ui.elements.status.textContent = message;
+    ui.elements.status.className = `status ${type}`;
+    ui.elements.status.style.display = "block";
+  }
+  function showImagenProgress(percentage) {
+    ui.elements.progressBar.style.display = "block";
+    ui.elements.progressFill.style.width = `${percentage}%`;
+  }
+  function hideImagenProgress() {
+    ui.elements.progressBar.style.display = "none";
+    ui.elements.progressFill.style.width = "0%";
   }
   async function init() {
     try {
