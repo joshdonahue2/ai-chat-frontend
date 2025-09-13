@@ -20,18 +20,6 @@ export async function initializeApp(user, profile) {
                 }
             });
 
-            // Mock chat history
-            const mockHistory = [
-                { role: 'user', content: 'What was the last thing I said?' },
-                { role: 'assistant', content: 'You asked about the last thing you said.' },
-                { role: 'user', content: 'And before that?' },
-                { role: 'assistant', content: 'You asked what the last thing you said was.' },
-            ];
-
-            mockHistory.forEach(message => {
-                ui.addMessage(message.role, message.content);
-            });
-
             ui.addMessage('assistant', `👋 Hello ${displayName}! I'm your AI assistant with long-term memory. What can I help you with today?`);
         }
         state.isInitialized = true;
@@ -69,6 +57,32 @@ function handleMessageInputKeydown(e) {
     }
 }
 
+async function loadHistory() {
+    if (!ui.elements.historyList) return;
+    ui.elements.historyList.innerHTML = '<li>Loading history...</li>';
+
+    try {
+        const history = await api.fetchHistory();
+        ui.elements.historyList.innerHTML = ''; // Clear loading message
+
+        if (history.length === 0) {
+            ui.elements.historyList.innerHTML = '<li>No history found.</li>';
+            return;
+        }
+
+        history.forEach(message => {
+            const li = document.createElement('li');
+            li.className = `history-item history-item-${message.role}`;
+            li.textContent = message.content;
+            ui.elements.historyList.appendChild(li);
+        });
+    } catch (error) {
+        console.error('Failed to load history:', error);
+        ui.elements.historyList.innerHTML = '<li>Error loading history.</li>';
+        ui.showToast('Failed to load chat history.', 'error');
+    }
+}
+
 function bindEvents() {
     ui.elements.authForm?.addEventListener('submit', (e) => auth.handleAuthSubmit(e));
     ui.elements.authToggleLink?.addEventListener('click', () => auth.toggleAuthMode());
@@ -81,8 +95,11 @@ function bindEvents() {
     ui.elements.backButton?.addEventListener('click', () => ui.showScreen('appContainer'));
     ui.elements.settingsButton?.addEventListener('click', () => ui.showScreen('settingsContainer'));
     ui.elements.navChat?.addEventListener('click', () => ui.showScreen('appContainer'));
-    ui.elements.navHistory?.addEventListener('click', () => ui.showScreen('historyContainer'));
-    ui.elements.navProfile?.addEventListener('click', () => ui.showScreen('settingsContainer'));
+    ui.elements.navHistory?.addEventListener('click', () => {
+        ui.showScreen('historyContainer');
+        loadHistory();
+    });
+    ui.elements.navSettings?.addEventListener('click', () => ui.showScreen('settingsContainer'));
 
     ui.elements.micButton?.addEventListener('click', () => console.log('Mic button clicked'));
 

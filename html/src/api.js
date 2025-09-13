@@ -68,5 +68,19 @@ export const api = {
             ui.addMessage('assistant', 'Sorry, I encountered an error. Please try again.');
             ui.showToast('Failed to get a response from the assistant.', 'error');
         }
+    },
+
+    async fetchHistory() {
+        console.log('Fetching chat history...');
+        // In a real app, this would make an API call.
+        // For now, we return a mock history.
+        return Promise.resolve([
+            { role: 'user', content: 'What was the last thing I said?' },
+            { role: 'assistant', content: 'You asked about the last thing you said.' },
+            { role: 'user', content: 'And before that?' },
+            { role: 'assistant', content: 'You asked what the last thing you said was.' },
+            { role: 'user', content: 'This is another message from the past.' },
+            { role: 'assistant', content: 'And this is another response.' },
+        ]);
     }
 };

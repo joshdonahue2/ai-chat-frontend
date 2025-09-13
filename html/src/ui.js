@@ -32,11 +32,12 @@ export const ui = {
         this.elements.thinkingIndicator = document.getElementById('thinking-indicator');
         this.elements.navChat = document.getElementById('nav-chat');
         this.elements.navHistory = document.getElementById('nav-history');
-        this.elements.navProfile = document.getElementById('nav-profile');
+        this.elements.navSettings = document.getElementById('nav-settings');
         this.elements.settingsContainer = document.getElementById('settings-container');
         this.elements.backButton = document.getElementById('back-button');
         this.elements.logoutButton = document.getElementById('logout-button');
         this.elements.historyContainer = document.getElementById('history-container');
+        this.elements.historyList = document.getElementById('history-list');
         this.elements.bottomNav = document.querySelector('.bottom-nav');
 
         Object.entries(this.elements).forEach(([key, element]) => {
@@ -60,7 +61,7 @@ export const ui = {
 
         this.elements.navChat?.classList.toggle('active', screenId === 'appContainer');
         this.elements.navHistory?.classList.toggle('active', screenId === 'historyContainer');
-        this.elements.navProfile?.classList.toggle('active', screenId === 'settingsContainer');
+        this.elements.navSettings?.classList.toggle('active', screenId === 'settingsContainer');
     },
 
     forceShowAuthScreen() {
