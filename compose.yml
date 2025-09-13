@@ -34,11 +34,11 @@ services:
     restart: unless-stopped
     environment:
       - SUPABASE_URL=${SUPABASE_URL}
-      - SUPABASE_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_KEY=${SUPERBASE_SERVICE_ROLE_KEY}
       - PORT=3000
       - NODE_ENV=production
-      - N8N_WEBHOOK_URL=${WEBHOOK_URL}
-      - CALLBACK_BASE_URL=http://localhost:3000
+      - N8N_WEBHOOK_URL=${IMAGE_URL}
+      - CALLBACK_BASE_URL=${CALLBACK_BASE_URL}
     networks:
       - ai-chat-network
     healthcheck:
