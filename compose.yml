@@ -38,6 +38,8 @@ services:
       - "3000:3000"
     env_file:
       - .env
+    environment:
+      SUPABASE_KEY: ${SUPABASE_ANON_KEY}
     restart: unless-stopped
     networks:
       - ai-network
