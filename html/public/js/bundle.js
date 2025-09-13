@@ -7899,6 +7899,11 @@ Option 2: Install and provide the "ws" package:
   // html/src/ui.js
   var ui = {
     elements: {},
+    screenElements: [
+      "appContainer",
+      "historyContainer",
+      "settingsContainer"
+    ],
     cacheElements() {
       console.log("=== CACHING ELEMENTS ===");
       this.elements.authContainer = document.getElementById("auth-container");
@@ -7922,37 +7927,56 @@ Option 2: Install and provide the "ws" package:
       this.elements.thinkingIndicator = document.getElementById("thinking-indicator");
       this.elements.navChat = document.getElementById("nav-chat");
       this.elements.navHistory = document.getElementById("nav-history");
-      this.elements.navProfile = document.getElementById("nav-profile");
+      this.elements.navSettings = document.getElementById("nav-settings");
+      this.elements.settingsContainer = document.getElementById("settings-container");
+      this.elements.backButton = document.getElementById("back-button");
+      this.elements.logoutButton = document.getElementById("logout-button");
+      this.elements.historyContainer = document.getElementById("history-container");
+      this.elements.historyList = document.getElementById("history-list");
+      this.elements.bottomNav = document.querySelector(".bottom-nav");
       Object.entries(this.elements).forEach(([key, element]) => {
         console.log(`${key}: ${element ? "FOUND" : "MISSING"}`);
       });
       console.log("=== END CACHING ===");
     },
+    showScreen(screenId) {
+      this.screenElements.forEach((key) => {
+        const element = this.elements[key];
+        if (element) {
+          element.classList.add("hidden");
+        }
+      });
+      const screenToShow = this.elements[screenId];
+      if (screenToShow) {
+        screenToShow.classList.remove("hidden");
+      }
+      this.elements.navChat?.classList.toggle("active", screenId === "appContainer");
+      this.elements.navHistory?.classList.toggle("active", screenId === "historyContainer");
+      this.elements.navSettings?.classList.toggle("active", screenId === "settingsContainer");
+    },
     forceShowAuthScreen() {
-      if (this.elements.authContainer) {
-        this.elements.authContainer.style.display = "block";
-        this.elements.authContainer.classList.remove("hidden");
-      }
-      if (this.elements.appContainer) {
-        this.elements.appContainer.style.display = "none";
-        this.elements.appContainer.classList.remove("show");
-      }
-      if (this.elements.loadingContainer) {
-        this.elements.loadingContainer.style.display = "none";
-      }
+      this.elements.authContainer?.classList.remove("hidden");
+      this.elements.bottomNav?.classList.add("hidden");
+      this.screenElements.forEach((key) => this.elements[key]?.classList.add("hidden"));
+      this.elements.loadingContainer?.classList.add("hidden");
     },
     forceShowAppScreen() {
-      if (this.elements.authContainer) {
-        this.elements.authContainer.style.display = "none";
-        this.elements.authContainer.classList.add("hidden");
-      }
-      if (this.elements.appContainer) {
-        this.elements.appContainer.style.display = "flex";
-        this.elements.appContainer.classList.add("show");
-      }
-      if (this.elements.loadingContainer) {
-        this.elements.loadingContainer.style.display = "none";
-      }
+      this.elements.authContainer?.classList.add("hidden");
+      this.elements.bottomNav?.classList.remove("hidden");
+      this.elements.loadingContainer?.classList.add("hidden");
+      this.showScreen("appContainer");
+    },
+    showSettingsPage() {
+      this.showScreen("settingsContainer");
+    },
+    hideSettingsPage() {
+      this.showScreen("appContainer");
+    },
+    showHistoryPage() {
+      this.showScreen("historyContainer");
+    },
+    hideHistoryPage() {
+      this.showScreen("appContainer");
     },
     addMessage(sender, content) {
       if (!this.elements.messages)
@@ -7961,7 +7985,7 @@ Option 2: Install and provide the "ws" package:
       messageDiv.className = `message ${sender}`;
       const avatar = document.createElement("img");
       avatar.className = "avatar";
-      avatar.src = sender === "user" ? "public/user-avatar.png" : "public/assistant-avatar.png";
+      avatar.src = sender === "user" ? "user-avatar.png" : "assistant-avatar.png";
       avatar.alt = sender;
       messageDiv.appendChild(avatar);
       const contentDiv = document.createElement("div");
@@ -7979,12 +8003,10 @@ Option 2: Install and provide the "ws" package:
       input.style.height = `${Math.min(input.scrollHeight, 120)}px`;
     },
     showLoading() {
-      if (this.elements.loadingContainer)
-        this.elements.loadingContainer.style.display = "flex";
+      this.elements.loadingContainer?.classList.remove("hidden");
     },
     hideLoading() {
-      if (this.elements.loadingContainer)
-        this.elements.loadingContainer.style.display = "none";
+      this.elements.loadingContainer?.classList.add("hidden");
     },
     setLoading(loading) {
       state.isLoading = loading;
@@ -8029,9 +8051,9 @@ Option 2: Install and provide the "ws" package:
 
   // html/src/api.js
   var config = {
-    supabaseUrl: "",
-    supabaseAnonKey: "",
-    webhookUrl: ""
+    supabaseUrl: "YOUR_SUPABASE_URL",
+    supabaseAnonKey: "SUPABASE_ANON_KEY",
+    webhookUrl: "MEMORY_AGENT_WEBHOOK_URL"
   };
   var supabase;
   var api = {
@@ -8084,6 +8106,17 @@ Option 2: Install and provide the "ws" package:
         ui.addMessage("assistant", "Sorry, I encountered an error. Please try again.");
         ui.showToast("Failed to get a response from the assistant.", "error");
       }
+    },
+    async fetchHistory() {
+      console.log("Fetching chat history...");
+      return Promise.resolve([
+        { role: "user", content: "What was the last thing I said?" },
+        { role: "assistant", content: "You asked about the last thing you said." },
+        { role: "user", content: "And before that?" },
+        { role: "assistant", content: "You asked what the last thing you said was." },
+        { role: "user", content: "This is another message from the past." },
+        { role: "assistant", content: "And this is another response." }
+      ]);
     }
   };
 
@@ -8228,17 +8261,45 @@ Option 2: Install and provide the "ws" package:
       handleMessageSend();
     }
   }
+  async function loadHistory() {
+    if (!ui.elements.historyList)
+      return;
+    ui.elements.historyList.innerHTML = "<li>Loading history...</li>";
+    try {
+      const history = await api.fetchHistory();
+      ui.elements.historyList.innerHTML = "";
+      if (history.length === 0) {
+        ui.elements.historyList.innerHTML = "<li>No history found.</li>";
+        return;
+      }
+      history.forEach((message) => {
+        const li = document.createElement("li");
+        li.className = `history-item history-item-${message.role}`;
+        li.textContent = message.content;
+        ui.elements.historyList.appendChild(li);
+      });
+    } catch (error) {
+      console.error("Failed to load history:", error);
+      ui.elements.historyList.innerHTML = "<li>Error loading history.</li>";
+      ui.showToast("Failed to load chat history.", "error");
+    }
+  }
   function bindEvents() {
     ui.elements.authForm?.addEventListener("submit", (e) => auth.handleAuthSubmit(e));
     ui.elements.authToggleLink?.addEventListener("click", () => auth.toggleAuthMode());
     ui.elements.sendButton?.addEventListener("click", () => handleMessageSend());
     ui.elements.messageInput?.addEventListener("keydown", (e) => handleMessageInputKeydown(e));
     ui.elements.messageInput?.addEventListener("input", () => ui.autoResizeInput());
-    ui.elements.settingsButton?.addEventListener("click", () => console.log("Settings button clicked"));
+    ui.elements.logoutButton?.addEventListener("click", () => auth.handleLogout());
+    ui.elements.backButton?.addEventListener("click", () => ui.showScreen("appContainer"));
+    ui.elements.settingsButton?.addEventListener("click", () => ui.showScreen("settingsContainer"));
+    ui.elements.navChat?.addEventListener("click", () => ui.showScreen("appContainer"));
+    ui.elements.navHistory?.addEventListener("click", () => {
+      ui.showScreen("historyContainer");
+      loadHistory();
+    });
+    ui.elements.navSettings?.addEventListener("click", () => ui.showScreen("settingsContainer"));
     ui.elements.micButton?.addEventListener("click", () => console.log("Mic button clicked"));
-    ui.elements.navChat?.addEventListener("click", () => console.log("Nav chat clicked"));
-    ui.elements.navHistory?.addEventListener("click", () => console.log("Nav history clicked"));
-    ui.elements.navProfile?.addEventListener("click", () => console.log("Nav profile clicked"));
     console.log("Events bound successfully");
   }
   async function init() {
