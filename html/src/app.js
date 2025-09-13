@@ -95,6 +95,10 @@ function bindEvents() {
     ui.elements.backButton?.addEventListener('click', () => ui.showScreen('appContainer'));
     ui.elements.settingsButton?.addEventListener('click', () => ui.showScreen('settingsContainer'));
     ui.elements.navChat?.addEventListener('click', () => ui.showScreen('appContainer'));
+    ui.elements.navImagen?.addEventListener('click', () => {
+        ui.showScreen('imagenContainer');
+        loadImagenUI();
+    });
     ui.elements.navHistory?.addEventListener('click', () => {
         ui.showScreen('historyContainer');
         loadHistory();
@@ -103,7 +107,167 @@ function bindEvents() {
 
     ui.elements.micButton?.addEventListener('click', () => console.log('Mic button clicked'));
 
+    // Imagen events
+    ui.elements.imageForm?.addEventListener('submit', (e) => handleImageGeneration(e));
+
     console.log('Events bound successfully');
+}
+
+async function handleImageGeneration(e) {
+    e.preventDefault();
+    const prompt = ui.elements.imageForm.prompt.value.trim();
+    if (!prompt) return;
+
+    setImagenLoading(true);
+    hideImagenResult();
+    showImagenStatus('Sending your request to the AI...', 'loading');
+    showImagenProgress(10);
+
+    try {
+        const data = await api.generateImage(prompt);
+        showImagenProgress(30);
+        showImagenStatus('Your image is being generated...', 'loading');
+        await pollForImageResult(data.taskId);
+    } catch (error) {
+        console.error('Generation error:', error);
+        showImagenStatus(`Error: ${error.message}`, 'error');
+    } finally {
+        setImagenLoading(false);
+        hideImagenProgress();
+    }
+}
+
+async function pollForImageResult(taskId) {
+    let attempts = 0;
+    const maxAttempts = 120;
+    let lastStatus = 'pending';
+
+    const poll = async (resolve, reject) => {
+        attempts++;
+        if (attempts > maxAttempts) {
+            clearInterval(state.pollInterval);
+            showImagenStatus('Generation timed out after 10 minutes.', 'error');
+            return reject(new Error('Generation timed out'));
+        }
+
+        try {
+            const data = await api.getImageStatus(taskId);
+            if (data.status !== lastStatus) {
+                lastStatus = data.status;
+                updateImagenStatusMessage(data.status, attempts);
+            }
+
+            if (data.status === 'completed' && data.imageData) {
+                clearInterval(state.pollInterval);
+                showImagenProgress(100);
+                await displayImagenResult(data.imageData);
+                resolve();
+            } else if (data.status === 'error') {
+                clearInterval(state.pollInterval);
+                showImagenStatus(`Generation failed: ${data.error || 'Unknown error'}`, 'error');
+                reject(new Error(data.error || 'Unknown error'));
+            } else {
+                let progress = 30;
+                if (data.status === 'processing') {
+                    progress = Math.min(40 + (attempts * 1), 85);
+                } else {
+                    progress = Math.min(30 + (attempts * 0.5), 70);
+                }
+                showImagenProgress(progress);
+                state.pollInterval = setTimeout(() => poll(resolve, reject), 5000);
+            }
+        } catch (error) {
+            console.error('Polling error:', error);
+            // Don't reject on polling error, just keep trying
+        }
+    };
+
+    return new Promise((resolve, reject) => {
+        state.pollInterval = setTimeout(() => poll(resolve, reject), 5000);
+    });
+}
+
+function updateImagenStatusMessage(status, attempts) {
+    const elapsed = Math.floor(attempts * 5 / 60);
+    const minutes = elapsed > 0 ? ` (${elapsed}m elapsed)` : '';
+    switch (status) {
+        case 'pending':
+            showImagenStatus(`Sending request to n8n...${minutes}`, 'loading');
+            break;
+        case 'processing':
+            showImagenStatus(`AI is generating your image...${minutes}`, 'loading');
+            break;
+        default:
+            showImagenStatus(`Processing your request...${minutes}`, 'loading');
+    }
+}
+
+async function displayImagenResult(base64Data) {
+    const existingImage = ui.elements.generatedImage;
+    try {
+        if (!base64Data || typeof base64Data !== 'string') {
+            throw new Error('Invalid or missing base64 data.');
+        }
+        const imageUrl = `data:image/png;base64,${base64Data.replace(/\s/g, '')}`;
+        const preloader = new Image();
+        preloader.onload = () => {
+            existingImage.src = preloader.src;
+            showImagenResult();
+            showImagenStatus('Image generated successfully!', 'success');
+        };
+        preloader.onerror = () => {
+            showImagenStatus('Error: The generated image data was corrupt.', 'error');
+        };
+        preloader.src = imageUrl;
+    } catch (error) {
+        showImagenStatus(`Failed to display image: ${error.message}`, 'error');
+    }
+}
+
+function hideImagenResult() {
+    ui.elements.resultSection.style.display = 'none';
+    ui.elements.generatedImage.src = '';
+}
+
+function showImagenResult() {
+    ui.elements.resultSection.style.display = 'block';
+}
+
+function setImagenLoading(loading) {
+    ui.elements.generateBtn.disabled = loading;
+    ui.elements.loadingSpinner.style.display = loading ? 'inline-block' : 'none';
+    ui.elements.btnText.textContent = loading ? 'Generating...' : 'Generate Image';
+}
+
+function showImagenStatus(message, type) {
+    ui.elements.status.textContent = message;
+    ui.elements.status.className = `status ${type}`;
+    ui.elements.status.style.display = 'block';
+}
+
+function showImagenProgress(percentage) {
+    ui.elements.progressBar.style.display = 'block';
+    ui.elements.progressFill.style.width = `${percentage}%`;
+}
+
+function hideImagenProgress() {
+    ui.elements.progressBar.style.display = 'none';
+    ui.elements.progressFill.style.width = '0%';
+}
+
+async function loadImagenUI() {
+    if (state.imagenUiLoaded) return;
+    try {
+        const response = await fetch('imagen.html');
+        const html = await response.text();
+        ui.elements.imagenContainer.innerHTML = html;
+        ui.cacheElements();
+        ui.elements.imageForm?.addEventListener('submit', (e) => handleImageGeneration(e));
+        state.imagenUiLoaded = true;
+    } catch (error) {
+        console.error('Failed to load Imagen UI:', error);
+        ui.elements.imagenContainer.innerHTML = '<p>Error loading image generation feature.</p>';
+    }
 }
 
 async function init() {

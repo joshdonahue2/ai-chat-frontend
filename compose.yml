@@ -12,18 +12,37 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    
-    # Health check
+    networks:
+      - ai-chat-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-    
-    # Logging configuration
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
+
+  imagen:
+    build:
+      context: ./html/imagen
+      dockerfile: Dockerfile
+    container_name: ai-image-generator
+    restart: unless-stopped
+    env_file:
+      - ./html/imagen/.env
+    networks:
+      - ai-chat-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  ai-chat-network:
+    driver: bridge

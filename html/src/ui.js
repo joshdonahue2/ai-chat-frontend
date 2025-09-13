@@ -7,6 +7,7 @@ export const ui = {
         'appContainer',
         'historyContainer',
         'settingsContainer',
+        'imagenContainer',
     ],
 
     cacheElements() {
@@ -39,6 +40,22 @@ export const ui = {
         this.elements.historyContainer = document.getElementById('history-container');
         this.elements.historyList = document.getElementById('history-list');
         this.elements.bottomNav = document.querySelector('.bottom-nav');
+        this.elements.navImagen = document.getElementById('nav-imagen');
+        this.elements.imagenContainer = document.getElementById('imagen-container');
+        this.elements.imageModal = document.getElementById('imageModal');
+        this.elements.modalImage = document.getElementById('modalImage');
+        this.elements.imageForm = document.getElementById('imageForm');
+        this.elements.generateBtn = document.getElementById('generateBtn');
+        this.elements.btnText = document.getElementById('btnText');
+        this.elements.loadingSpinner = document.querySelector('.loading-spinner');
+        this.elements.status = document.getElementById('status');
+        this.elements.resultSection = document.getElementById('resultSection');
+        this.elements.generatedImage = document.getElementById('generatedImage');
+        this.elements.downloadBtn = document.getElementById('downloadBtn');
+        this.elements.progressBar = document.getElementById('progressBar');
+        this.elements.progressFill = document.getElementById('progressFill');
+        this.elements.imagenHistoryPage = document.getElementById('historyPage');
+        this.elements.imagenHistoryList = document.getElementById('historyList');
 
         Object.entries(this.elements).forEach(([key, element]) => {
             console.log(`${key}: ${element ? 'FOUND' : 'MISSING'}`);
@@ -60,6 +77,7 @@ export const ui = {
         }
 
         this.elements.navChat?.classList.toggle('active', screenId === 'appContainer');
+        this.elements.navImagen?.classList.toggle('active', screenId === 'imagenContainer');
         this.elements.navHistory?.classList.toggle('active', screenId === 'historyContainer');
         this.elements.navSettings?.classList.toggle('active', screenId === 'settingsContainer');
     },
