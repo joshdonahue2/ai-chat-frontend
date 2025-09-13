@@ -24,10 +24,9 @@ WORKDIR /app/html
 RUN npm install
 
 # Copy the build script
-COPY build.sh /app/
+COPY build.sh /app/html/
 
 # Make the build script executable and run it
-WORKDIR /app
 RUN chmod +x build.sh
 RUN ./build.sh
 

@@ -37,7 +37,7 @@ services:
       - SUPABASE_KEY=${SUPABASE_ANON_KEY}
       - PORT=3000
       - NODE_ENV=production
-      - N8N_WEBHOOK_URL=http://localhost:5678/webhook/generate-image
+      - N8N_WEBHOOK_URL=${WEBHOOK_URL}
       - CALLBACK_BASE_URL=http://localhost:3000
     networks:
       - ai-chat-network

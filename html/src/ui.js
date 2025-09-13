@@ -85,7 +85,11 @@ export const ui = {
     forceShowAuthScreen() {
         this.elements.authContainer?.classList.remove('hidden');
         this.elements.bottomNav?.classList.add('hidden');
-        this.screenElements.forEach(key => this.elements[key]?.classList.add('hidden'));
+        this.screenElements.forEach(key => {
+            if (key !== 'authContainer') {
+                this.elements[key]?.classList.add('hidden');
+            }
+        });
         this.elements.loadingContainer?.classList.add('hidden');
     },
 
