@@ -6,6 +6,7 @@ services:
         - SUPABASE_URL=${SUPABASE_URL}
         - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
         - WEBHOOK_URL=${WEBHOOK_URL}
+        - IMAGE_WEBHOOK_URL=${IMAGE_WEBHOOK_URL}
     container_name: ai-chat-app
     ports:
       - "$PORT:8080"
