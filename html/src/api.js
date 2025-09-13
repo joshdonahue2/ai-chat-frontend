@@ -5,7 +5,8 @@ import { ui } from './ui.js';
 const config = {
     supabaseUrl: process.env.SUPABASE_URL,
     supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
-    webhookUrl: process.env.WEBHOOK_URL
+    webhookUrl: process.env.WEBHOOK_URL,
+    imageWebhookUrl: process.env.IMAGE_WEBHOOK_URL
 };
 
 let supabase;
@@ -68,6 +69,24 @@ export const api = {
             ui.addMessage('assistant', 'Sorry, I encountered an error. Please try again.');
             ui.showToast('Failed to get a response from the assistant.', 'error');
         }
+    },
+
+    async generateImage(prompt) {
+        const response = await fetch(config.imageWebhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt, taskId: '' }), // taskId is empty for new requests
+        });
+        return response.json();
+    },
+
+    async getImageStatus(taskId) {
+        const response = await fetch(config.imageWebhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ taskId }),
+        });
+        return response.json();
     },
 
     async fetchHistory() {

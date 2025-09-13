@@ -7,7 +7,7 @@ const urlsToCache = [
   '/icon-144.png',
   '/icon-192.png',
   '/icon-512.png',
-  '/js/app.js'
+  '/js/bundle.js'
 ];
 const apiUrl = 'https://supabase.donahuenet.xyz';
 
