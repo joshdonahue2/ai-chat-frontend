@@ -5,7 +5,9 @@ import { ui } from './ui.js';
 const config = {
     supabaseUrl: process.env.SUPABASE_URL,
     supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
-    webhookUrl: process.env.WEBHOOK_URL
+    webhookUrl: process.env.WEBHOOK_URL,
+    imageUrl: process.env.IMAGE_URL,
+    callbackBaseUrl: process.env.CALLBACK_BASE_URL,
 };
 
 let supabase;
@@ -86,7 +88,7 @@ export const api = {
 
     async generateImage(prompt) {
         const { data: { session } } = await supabase.auth.getSession();
-        const response = await fetch('/api/generate', {
+        const response = await fetch(config.imageUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -102,7 +104,7 @@ export const api = {
     },
 
     async getImageStatus(taskId) {
-        const response = await fetch(`/api/status/${taskId}`);
+        const response = await fetch(`${config.callbackBaseUrl}/status/${taskId}`);
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }

@@ -17,6 +17,8 @@ echo "Bundling JavaScript with esbuild..."
 npx esbuild "$ENTRY_POINT" --bundle --outfile="$DEST_FILE" --format=iife --allow-overwrite \
   --define:process.env.SUPABASE_URL="'$SUPABASE_URL'" \
   --define:process.env.SUPABASE_ANON_KEY="'$SUPABASE_ANON_KEY'" \
-  --define:process.env.WEBHOOK_URL="'$WEBHOOK_URL'"
+  --define:process.env.WEBHOOK_URL="'$WEBHOOK_URL'" \
+  --define:process.env.IMAGE_URL="'$IMAGE_URL'" \
+  --define:process.env.CALLBACK_BASE_URL="'$CALLBACK_BASE_URL'"
 
 echo "Build successful: $DEST_FILE created."
