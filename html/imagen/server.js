@@ -27,6 +27,11 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Middleware
+app.use(cors());
+app.use(express.json({ limit: '50mb' }));
+
+// API Routes
 // User registration endpoint
 app.post('/api/register', async (req, res) => {
     const { email, password } = req.body;
@@ -63,15 +68,6 @@ app.post('/api/login', async (req, res) => {
 
 // Store task status in memory (in production, use Redis or database)
 const taskStore = new Map();
-
-// Middleware
-app.use(cors());
-app.use(express.json({ limit: '50mb' }));
-
-// Serve the frontend
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
 
 // Generate image endpoint
 app.post('/api/generate', async (req, res) => {
@@ -350,6 +346,12 @@ app.get('/api/health', (req, res) => {
         timestamp: new Date().toISOString(),
         activeTasks: taskStore.size
     });
+});
+
+// Frontend
+app.use(express.static('public'));
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Send request to n8n webhook
