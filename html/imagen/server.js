@@ -185,8 +185,11 @@ app.post('/api/webhook/result', upload.single('imageData'), async (req, res) => 
         
         console.log(`[${taskId}] Received multipart webhook. Success: ${success}`);
 
-        if (!taskId) {
-            return res.status(400).json({ error: 'Task ID is required' });
+        // More robust check for taskId to handle invalid values from n8n
+        const isUUID = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(taskId);
+        if (!taskId || taskId === 'undefined' || !isUUID) {
+            console.error(`[${taskId || 'undefined'}] Invalid or missing Task ID in webhook payload.`);
+            return res.status(400).json({ error: 'A valid Task ID is required.' });
         }
 
         // Fetch the original task from Supabase to get user_id and prompt

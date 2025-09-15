@@ -88,7 +88,7 @@ export const api = {
 
     async generateImage(prompt) {
         const { data: { session } } = await supabase.auth.getSession();
-        const response = await fetch(config.imageUrl, {
+        const response = await fetch(`${config.callbackBaseUrl}/api/generate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
