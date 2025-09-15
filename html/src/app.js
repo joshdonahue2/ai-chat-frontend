@@ -117,6 +117,7 @@ async function handleImageGeneration(e) {
 
     setImagenLoading(true);
     hideImagenResult();
+    hideImagenStatus();
     showImagenStatus('Sending your request to the AI...', 'loading');
     showImagenProgress(10);
 
@@ -128,7 +129,6 @@ async function handleImageGeneration(e) {
     } catch (error) {
         console.error('Generation error:', error);
         showImagenStatus(`Error: ${error.message}`, 'error');
-    } finally {
         setImagenLoading(false);
         hideImagenProgress();
     }
@@ -140,9 +140,13 @@ async function pollForImageResult(taskId) {
     let lastStatus = 'pending';
 
     const poll = async (resolve, reject) => {
+        if (state.pollInterval === null) {
+            // Polling was cancelled
+            return reject(new Error('Polling cancelled'));
+        }
+
         attempts++;
         if (attempts > maxAttempts) {
-            clearInterval(state.pollInterval);
             showImagenStatus('Generation timed out after 10 minutes.', 'error');
             return reject(new Error('Generation timed out'));
         }
@@ -155,12 +159,9 @@ async function pollForImageResult(taskId) {
             }
 
             if (data.status === 'completed' && data.imageData) {
-                clearInterval(state.pollInterval);
-                showImagenProgress(100);
                 await displayImagenResult(data.imageData);
                 resolve();
             } else if (data.status === 'error') {
-                clearInterval(state.pollInterval);
                 showImagenStatus(`Generation failed: ${data.error || 'Unknown error'}`, 'error');
                 reject(new Error(data.error || 'Unknown error'));
             } else {
@@ -175,12 +176,24 @@ async function pollForImageResult(taskId) {
             }
         } catch (error) {
             console.error('Polling error:', error);
-            // Don't reject on polling error, just keep trying
+            // Keep trying on polling error, but count towards max attempts
+            state.pollInterval = setTimeout(() => poll(resolve, reject), 5000);
         }
     };
 
     return new Promise((resolve, reject) => {
+        // Clear any existing poll before starting a new one.
+        if (state.pollInterval) {
+            clearInterval(state.pollInterval);
+        }
         state.pollInterval = setTimeout(() => poll(resolve, reject), 5000);
+    }).finally(() => {
+        if (state.pollInterval) {
+            clearInterval(state.pollInterval);
+            state.pollInterval = null;
+        }
+        setImagenLoading(false);
+        hideImagenProgress();
     });
 }
 
@@ -199,57 +212,90 @@ function updateImagenStatusMessage(status, attempts) {
     }
 }
 
-async function displayImagenResult(base64Data) {
-    const existingImage = ui.elements.generatedImage;
-    try {
-        if (!base64Data || typeof base64Data !== 'string') {
-            throw new Error('Invalid or missing base64 data.');
+function displayImagenResult(base64Data) {
+    return new Promise((resolve, reject) => {
+        const existingImage = ui.elements.generatedImage;
+        try {
+            if (!base64Data || typeof base64Data !== 'string') {
+                throw new Error('Invalid or missing base64 data.');
+            }
+            const imageUrl = `data:image/png;base64,${base64Data.replace(/\s/g, '')}`;
+            const preloader = new Image();
+            preloader.onload = () => {
+                try {
+                    existingImage.src = preloader.src;
+                    showImagenResult();
+                    showImagenStatus('Image generated successfully!', 'success');
+                    setTimeout(hideImagenStatus, 4000);
+                    resolve();
+                } catch (e) {
+                    reject(e);
+                }
+            };
+            preloader.onerror = () => {
+                const errorMsg = 'Error: The generated image data was corrupt.';
+                showImagenStatus(errorMsg, 'error');
+                reject(new Error(errorMsg));
+            };
+            preloader.src = imageUrl;
+        } catch (error) {
+            showImagenStatus(`Failed to display image: ${error.message}`, 'error');
+            reject(error);
         }
-        const imageUrl = `data:image/png;base64,${base64Data.replace(/\s/g, '')}`;
-        const preloader = new Image();
-        preloader.onload = () => {
-            existingImage.src = preloader.src;
-            showImagenResult();
-            showImagenStatus('Image generated successfully!', 'success');
-        };
-        preloader.onerror = () => {
-            showImagenStatus('Error: The generated image data was corrupt.', 'error');
-        };
-        preloader.src = imageUrl;
-    } catch (error) {
-        showImagenStatus(`Failed to display image: ${error.message}`, 'error');
-    }
+    });
 }
 
 function hideImagenResult() {
-    ui.elements.resultSection.style.display = 'none';
-    ui.elements.generatedImage.src = '';
+    if (ui.elements.resultSection) {
+        ui.elements.resultSection.style.display = 'none';
+        ui.elements.generatedImage.src = '';
+    }
+}
+
+function hideImagenStatus() {
+    if (ui.elements.status) {
+        ui.elements.status.style.display = 'none';
+    }
 }
 
 function showImagenResult() {
-    ui.elements.resultSection.style.display = 'block';
+    if (ui.elements.resultSection) {
+        ui.elements.resultSection.style.display = 'block';
+    }
 }
 
 function setImagenLoading(loading) {
-    ui.elements.generateBtn.disabled = loading;
-    ui.elements.loadingSpinner.style.display = loading ? 'inline-block' : 'none';
-    ui.elements.btnText.textContent = loading ? 'Generating...' : 'Generate Image';
+    if (ui.elements.generateBtn) {
+        ui.elements.generateBtn.disabled = loading;
+    }
+    if (ui.elements.loadingSpinner) {
+        ui.elements.loadingSpinner.style.display = loading ? 'inline-block' : 'none';
+    }
+    if (ui.elements.btnText) {
+        ui.elements.btnText.textContent = loading ? 'Generating...' : 'Generate Image';
+    }
 }
 
 function showImagenStatus(message, type) {
-    ui.elements.status.textContent = message;
-    ui.elements.status.className = `status ${type}`;
-    ui.elements.status.style.display = 'block';
+    if (ui.elements.status) {
+        ui.elements.status.textContent = message;
+        ui.elements.status.className = `status ${type}`;
+        ui.elements.status.style.display = 'block';
+    }
 }
 
 function showImagenProgress(percentage) {
-    ui.elements.progressBar.style.display = 'block';
-    ui.elements.progressFill.style.width = `${percentage}%`;
+    if (ui.elements.progressBar) {
+        ui.elements.progressBar.style.display = 'block';
+        ui.elements.progressFill.style.width = `${percentage}%`;
+    }
 }
 
 function hideImagenProgress() {
-    ui.elements.progressBar.style.display = 'none';
-    ui.elements.progressFill.style.width = '0%';
+    if (ui.elements.progressBar) {
+        ui.elements.progressBar.style.display = 'none';
+        ui.elements.progressFill.style.width = '0%';
+    }
 }
 
 async function init() {
@@ -263,7 +309,29 @@ async function init() {
         });
 
         ui.cacheElements();
-        bindEvents();
+        // Add checks to ensure elements exist before adding event listeners
+        if (ui.elements.authForm) ui.elements.authForm.addEventListener('submit', (e) => auth.handleAuthSubmit(e));
+        if (ui.elements.authToggleLink) ui.elements.authToggleLink.addEventListener('click', () => auth.toggleAuthMode());
+        if (ui.elements.sendButton) ui.elements.sendButton.addEventListener('click', () => handleMessageSend());
+        if (ui.elements.messageInput) {
+            ui.elements.messageInput.addEventListener('keydown', (e) => handleMessageInputKeydown(e));
+            ui.elements.messageInput.addEventListener('input', () => ui.autoResizeInput());
+        }
+        if (ui.elements.logoutButton) ui.elements.logoutButton.addEventListener('click', () => auth.handleLogout());
+        if (ui.elements.backButton) ui.elements.backButton.addEventListener('click', () => ui.showScreen('appContainer'));
+        if (ui.elements.settingsButton) ui.elements.settingsButton.addEventListener('click', () => ui.showScreen('settingsContainer'));
+        if (ui.elements.navChat) ui.elements.navChat.addEventListener('click', () => ui.showScreen('appContainer'));
+        if (ui.elements.navImagen) ui.elements.navImagen.addEventListener('click', () => ui.showScreen('imagenContainer'));
+        if (ui.elements.navHistory) ui.elements.navHistory.addEventListener('click', () => {
+            ui.showScreen('historyContainer');
+            loadHistory();
+        });
+        if (ui.elements.navSettings) ui.elements.navSettings.addEventListener('click', () => ui.showScreen('settingsContainer'));
+        if (ui.elements.micButton) ui.elements.micButton.addEventListener('click', () => console.log('Mic button clicked'));
+        if (ui.elements.imageForm) ui.elements.imageForm.addEventListener('submit', (e) => handleImageGeneration(e));
+        
+        console.log('Events bound successfully');
+
         const supabase = await api.initializeSupabase();
 
         const { data: { session } } = await supabase.auth.getSession();

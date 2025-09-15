@@ -74,6 +74,13 @@
 .imagen-container .status.success { background:linear-gradient(90deg,#fff7ee,#efe6ff); color:#ff6e00; }
 .imagen-container .status.error { background:linear-gradient(90deg,#ffecec,#f3e1ff); color:#a259ff; }
 
+imagen-container .status.loading {
+    background: #1e1e2f;
+    color: #eef2ff;
+    border: 1px solid rgba(162, 89, 255, 0.2);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
 /* Modal styles */
 .modal-overlay {
     display: none;
