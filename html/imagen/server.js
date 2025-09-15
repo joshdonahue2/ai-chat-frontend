@@ -1,5 +1,30 @@
 require('dotenv').config();
 
+/*
+-- SQL to create the image_tasks table in Supabase
+CREATE TABLE IF NOT EXISTS image_tasks (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    task_id UUID NOT NULL UNIQUE,
+    user_id UUID REFERENCES auth.users(id),
+    status TEXT NOT NULL DEFAULT 'pending',
+    prompt TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    completed_at TIMESTAMPTZ,
+    image_data TEXT,
+    error TEXT
+);
+
+-- Enable RLS
+ALTER TABLE image_tasks ENABLE ROW LEVEL SECURITY;
+
+-- Policies
+CREATE POLICY "Allow users to manage their own image tasks"
+ON image_tasks
+FOR ALL
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
+*/
+
 // Helper: get user from Supabase access token
 async function getUserFromToken(token) {
     if (!token) return null;
@@ -66,9 +91,6 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Store task status in memory (in production, use Redis or database)
-const taskStore = new Map();
-
 // Generate image endpoint
 app.post('/api/generate', async (req, res) => {
     try {
@@ -83,25 +105,38 @@ app.post('/api/generate', async (req, res) => {
             return res.status(400).json({ error: 'Prompt is required and must be a non-empty string' });
         }
         const taskId = uuidv4();
-        // Initialize task status
-        taskStore.set(taskId, {
-            status: 'pending',
-            prompt: prompt.trim(),
-            createdAt: new Date(),
-            imageData: null,
-            error: null,
-            user_id: user.id
-        });
-        console.log(`[${taskId}] Starting image generation for prompt: "${prompt.trim()}" by user ${user.id}`);
+        const trimmedPrompt = prompt.trim();
+
+        // Insert task into Supabase
+        const { data, error } = await supabase
+            .from('image_tasks')
+            .insert([
+                {
+                    task_id: taskId,
+                    user_id: user.id,
+                    prompt: trimmedPrompt,
+                    status: 'pending'
+                }
+            ])
+            .select();
+
+        if (error) {
+            console.error(`[${taskId}] Supabase insert error on generate:`, error.message);
+            return res.status(500).json({ error: 'Failed to create task' });
+        }
+
+        console.log(`[${taskId}] Starting image generation for prompt: "${trimmedPrompt}" by user ${user.id}`);
+
         // Send request to n8n webhook (don't wait for response)
-        sendToN8N(taskId, prompt.trim()).catch(error => {
-            console.error(`[${taskId}] Error sending to n8n:`, error.message);
-            taskStore.set(taskId, {
-                ...taskStore.get(taskId),
-                status: 'error',
-                error: `Failed to process request: ${error.message}`
-            });
+        sendToN8N(taskId, trimmedPrompt).catch(async (n8nError) => {
+            console.error(`[${taskId}] Error sending to n8n:`, n8nError.message);
+            // Update task in Supabase to reflect the error
+            await supabase
+                .from('image_tasks')
+                .update({ status: 'error', error: `Failed to dispatch to n8n: ${n8nError.message}` })
+                .eq('task_id', taskId);
         });
+
         res.json({ taskId, status: 'pending', message: 'Image generation started' });
     } catch (error) {
         console.error('Generate endpoint error:', error);
@@ -110,59 +145,36 @@ app.post('/api/generate', async (req, res) => {
 });
 
 // Check task status endpoint
-app.get('/api/status/:taskId', (req, res) => {
+app.get('/api/status/:taskId', async (req, res) => {
     const { taskId } = req.params;
-    
-    const task = taskStore.get(taskId);
-    if (!task) {
-        return res.status(404).json({ 
-            error: 'Task not found' 
+
+    if (!taskId) {
+        return res.status(400).json({ error: 'Task ID is required' });
+    }
+
+    try {
+        const { data: task, error } = await supabase
+            .from('image_tasks')
+            .select('task_id, status, image_data, error, created_at')
+            .eq('task_id', taskId)
+            .single();
+
+        if (error || !task) {
+            console.error(`[${taskId}] Task not found in Supabase:`, error?.message);
+            return res.status(404).json({ error: 'Task not found' });
+        }
+
+        res.json({
+            taskId: task.task_id,
+            status: task.status,
+            imageData: task.image_data,
+            error: task.error,
+            createdAt: task.created_at
         });
+    } catch (err) {
+        console.error(`[${taskId}] Error fetching task status:`, err.message);
+        res.status(500).json({ error: 'Internal server error' });
     }
-
-    // Calculate elapsed time
-    const elapsed = Date.now() - new Date(task.createdAt).getTime();
-    const elapsedMinutes = Math.floor(elapsed / (1000 * 60));
-    const elapsedSeconds = Math.floor((elapsed % (1000 * 60)) / 1000);
-
-    // Clean up old completed tasks (optional)
-    if (task.status === 'completed' && task.completedAt) {
-        const hoursSinceCompletion = (Date.now() - task.completedAt) / (1000 * 60 * 60);
-        if (hoursSinceCompletion > 24) {
-            taskStore.delete(taskId);
-            return res.status(404).json({ 
-                error: 'Task expired' 
-            });
-        }
-    }
-
-    // Log status check for long-running tasks
-    if (elapsedMinutes > 2 && task.status !== 'completed') {
-        console.log(`[${taskId}] Status check - ${task.status} for ${elapsedMinutes}m${elapsedSeconds}s`);
-    }
-
-    const response = {
-        taskId,
-        status: task.status,
-        imageData: task.imageData,
-        error: task.error,
-        createdAt: task.createdAt,
-        elapsedTime: {
-            minutes: elapsedMinutes,
-            seconds: elapsedSeconds,
-            total: elapsed
-        }
-    };
-
-    // Add additional debug info for non-completed tasks
-    if (task.status !== 'completed') {
-        response.debug = {
-            sentToN8n: !!task.sentToN8nAt,
-            n8nResponse: task.n8nResponse ? 'received' : 'none'
-        };
-    }
-
-    res.json(response);
 });
 
 // Webhook endpoint for n8n to send results back
@@ -177,62 +189,67 @@ app.post('/api/webhook/result', upload.single('imageData'), (req, res) => {
             return res.status(400).json({ error: 'Task ID is required' });
         }
 
-        const task = taskStore.get(taskId);
-        if (!task) {
-            console.log(`[${taskId}] Task not found in store for webhook.`);
+        // Fetch the original task from Supabase to get user_id and prompt
+        const { data: task, error: fetchError } = await supabase
+            .from('image_tasks')
+            .select('user_id, prompt')
+            .eq('task_id', taskId)
+            .single();
+
+        if (fetchError || !task) {
+            console.log(`[${taskId}] Task not found in Supabase for webhook.`, fetchError?.message);
             return res.status(404).json({ error: 'Task not found' });
         }
 
-        // 'success' will be a string 'true' or 'false', so we check against 'true'
         if (success === 'true' && req.file) {
-            // The file is now in req.file.buffer.
-            // We perform the final, reliable conversion to base64 here.
             const finalBase64 = req.file.buffer.toString('base64');
-
-            taskStore.set(taskId, {
-                ...task,
+            const updatePayload = {
                 status: 'completed',
-                imageData: finalBase64, // Use the reliably converted data
-                completedAt: Date.now()
-            });
-            console.log(`[${taskId}] Image received and converted successfully.`);
+                image_data: finalBase64,
+                completed_at: new Date().toISOString(),
+                error: null
+            };
 
-            // Save to Supabase image_history table, handle duplicate key errors gracefully
-            (async () => {
-                try {
-                    const { data: insertData, error: dbError, status, statusText } = await supabase
-                        .from('image_history')
-                        .insert([
-                            {
-                                task_id: taskId,
-                                prompt: task.prompt,
-                                image_data: finalBase64,
-                                created_at: new Date().toISOString(),
-                                user_id: task.user_id || null
-                            }
-                        ]);
-                    if (dbError) {
-                        // Check for duplicate key error (Postgres error code 23505)
-                        if (dbError.code === '23505' || (dbError.message && dbError.message.includes('duplicate key')) ) {
-                            console.log(`[${taskId}] Duplicate image history, not inserted.`);
-                        } else {
-                            console.error(`[${taskId}] Supabase insert error:`, dbError.message);
-                        }
-                    } else {
-                        console.log(`[${taskId}] Image history saved to Supabase.`);
+            // Update task in Supabase
+            const { error: updateError } = await supabase
+                .from('image_tasks')
+                .update(updatePayload)
+                .eq('task_id', taskId);
+
+            if (updateError) {
+                console.error(`[${taskId}] Supabase update error:`, updateError.message);
+                // Don't stop; still try to save to history
+            } else {
+                 console.log(`[${taskId}] Image received and task updated successfully.`);
+            }
+
+            // Save to Supabase image_history table
+            const { error: historyError } = await supabase
+                .from('image_history')
+                .insert([
+                    {
+                        task_id: taskId,
+                        prompt: task.prompt,
+                        image_data: finalBase64,
+                        user_id: task.user_id
                     }
-                } catch (e) {
-                    console.error(`[${taskId}] Supabase error:`, e.message);
-                }
-            })();
+                ]);
+
+            if (historyError && historyError.code !== '23505') { // Ignore duplicate key errors
+                console.error(`[${taskId}] Supabase insert error for history:`, historyError.message);
+            } else {
+                console.log(`[${taskId}] Image history saved to Supabase.`);
+            }
 
         } else {
-            taskStore.set(taskId, {
-                ...task,
+            // Handle generation failure
+            const updatePayload = {
                 status: 'error',
-                error: error || 'Unknown error occurred during generation'
-            });
-            console.log(`[${taskId}] Image generation failed: ${error}`);
+                error: error || 'Unknown error occurred during generation',
+                completed_at: new Date().toISOString()
+            };
+            await supabase.from('image_tasks').update(updatePayload).eq('task_id', taskId);
+            console.log(`[${taskId}] Image generation failed: ${updatePayload.error}`);
         }
 
         res.json({ success: true, message: 'Result processed' });
@@ -340,12 +357,30 @@ app.get('/api/history', async (req, res) => {
 });
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-    res.json({ 
-        status: 'healthy',
-        timestamp: new Date().toISOString(),
-        activeTasks: taskStore.size
-    });
+app.get('/api/health', async (req, res) => {
+    try {
+        const { count, error } = await supabase
+            .from('image_tasks')
+            .select('*', { count: 'exact', head: true })
+            .in('status', ['pending', 'processing']);
+
+        if (error) {
+            throw error;
+        }
+
+        res.json({
+            status: 'healthy',
+            timestamp: new Date().toISOString(),
+            activeTasks: count
+        });
+    } catch (error) {
+        console.error('Health check failed:', error.message);
+        res.status(503).json({
+            status: 'unhealthy',
+            reason: 'Failed to connect to database',
+            error: error.message
+        });
+    }
 });
 
 // Frontend
@@ -362,7 +397,7 @@ async function sendToN8N(taskId, prompt) {
         const response = await axios.post(N8N_WEBHOOK_URL, {
             taskId,
             prompt,
-            callbackUrl: `https://imagen.donahuenet.xyz/api/webhook/result`
+            callbackUrl: `${process.env.CALLBACK_BASE_URL}/api/webhook/result`
         }, {
             timeout: 30000, // 30 second timeout for the initial request
             headers: {
@@ -373,51 +408,24 @@ async function sendToN8N(taskId, prompt) {
 
         console.log(`[${taskId}] Successfully sent to n8n, status: ${response.status}`);
         
-        // Update task status to processing
-        const task = taskStore.get(taskId);
-        if (task) {
-            taskStore.set(taskId, {
-                ...task,
-                status: 'processing'
-            });
-        }
+        // Update task status to processing in Supabase
+        await supabase
+            .from('image_tasks')
+            .update({ status: 'processing' })
+            .eq('task_id', taskId);
 
     } catch (error) {
         console.error(`[${taskId}] n8n request failed:`, error.message);
         
-        // Update task with error
-        const task = taskStore.get(taskId);
-        if (task) {
-            taskStore.set(taskId, {
-                ...task,
-                status: 'error',
-                error: `Failed to start generation: ${error.message}`
-            });
-        }
+        // Update task with error in Supabase
+        await supabase
+            .from('image_tasks')
+            .update({ status: 'error', error: `Failed to start generation: ${error.message}` })
+            .eq('task_id', taskId);
         
         throw error;
     }
 }
-
-// Cleanup old tasks periodically (runs every hour)
-setInterval(() => {
-    const now = Date.now();
-    let cleaned = 0;
-    
-    for (const [taskId, task] of taskStore.entries()) {
-        const ageHours = (now - new Date(task.createdAt).getTime()) / (1000 * 60 * 60);
-        
-        // Remove tasks older than 24 hours
-        if (ageHours > 24) {
-            taskStore.delete(taskId);
-            cleaned++;
-        }
-    }
-    
-    if (cleaned > 0) {
-        console.log(`Cleaned up ${cleaned} old tasks. Active tasks: ${taskStore.size}`);
-    }
-}, 60 * 60 * 1000); // Run every hour
 
 // Error handling middleware
 app.use((error, req, res, next) => {
@@ -436,8 +444,8 @@ app.use('*', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`Frontend available at: https://imagen.donahuenet.xyz`);
-    console.log(`API health check: https://imagen.donahuenet.xyz/api/health`);
+    console.log(`Frontend available at: ${process.env.CALLBACK_BASE_URL}`);
+    console.log(`API health check: ${process.env.CALLBACK_BASE_URL}/api/health`);
     console.log(`n8n webhook URL: ${N8N_WEBHOOK_URL}`);
 });
 
