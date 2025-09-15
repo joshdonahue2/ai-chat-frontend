@@ -87,8 +87,10 @@ function bindEvents() {
     ui.elements.authForm?.addEventListener('submit', (e) => auth.handleAuthSubmit(e));
     ui.elements.authToggleLink?.addEventListener('click', () => auth.toggleAuthMode());
     ui.elements.sendButton?.addEventListener('click', () => handleMessageSend());
-    ui.elements.messageInput?.addEventListener('keydown', (e) => handleMessageInputKeydown(e));
-    ui.elements.messageInput?.addEventListener('input', () => ui.autoResizeInput());
+    if (ui.elements.messageInput) {
+        ui.elements.messageInput.addEventListener('keydown', (e) => handleMessageInputKeydown(e));
+        ui.elements.messageInput.addEventListener('input', () => ui.autoResizeInput());
+    }
     ui.elements.logoutButton?.addEventListener('click', () => auth.handleLogout());
 
     // Navigation events
@@ -115,17 +117,23 @@ async function handleImageGeneration(e) {
     const prompt = ui.elements.imageForm.prompt.value.trim();
     if (!prompt) return;
 
+    // Cancel any ongoing polling from a previous request
+    if (state.pollInterval) {
+        clearInterval(state.pollInterval);
+        state.pollInterval = null;
+    }
+    
     setImagenLoading(true);
     hideImagenResult();
-    hideImagenStatus();
     showImagenStatus('Sending your request to the AI...', 'loading');
     showImagenProgress(10);
 
     try {
         const data = await api.generateImage(prompt);
+        state.currentImageTaskId = data.taskId; // Set the current task ID
         showImagenProgress(30);
         showImagenStatus('Your image is being generated...', 'loading');
-        await pollForImageResult(data.taskId);
+        pollForImageResult(); // This function now manages its own lifecycle
     } catch (error) {
         console.error('Generation error:', error);
         showImagenStatus(`Error: ${error.message}`, 'error');
@@ -134,68 +142,69 @@ async function handleImageGeneration(e) {
     }
 }
 
-async function pollForImageResult(taskId) {
+function pollForImageResult() {
     let attempts = 0;
-    const maxAttempts = 120;
+    const maxAttempts = 120; // 10 minutes
     let lastStatus = 'pending';
+    const taskId = state.currentImageTaskId;
 
-    const poll = async (resolve, reject) => {
-        if (state.pollInterval === null) {
-            // Polling was cancelled
-            return reject(new Error('Polling cancelled'));
+    const poll = async () => {
+        // If the task ID has changed, this is a zombie poll. Stop.
+        if (state.currentImageTaskId !== taskId) {
+            return; 
         }
 
         attempts++;
         if (attempts > maxAttempts) {
+            clearInterval(state.pollInterval);
+            state.pollInterval = null;
             showImagenStatus('Generation timed out after 10 minutes.', 'error');
-            return reject(new Error('Generation timed out'));
+            setImagenLoading(false);
+            hideImagenProgress();
+            return;
         }
 
         try {
             const data = await api.getImageStatus(taskId);
+            
+            // Check again after await, in case a new request was made
+            if (state.currentImageTaskId !== taskId) {
+                return;
+            }
+
             if (data.status !== lastStatus) {
                 lastStatus = data.status;
                 updateImagenStatusMessage(data.status, attempts);
             }
 
             if (data.status === 'completed' && data.imageData) {
+                clearInterval(state.pollInterval);
+                state.pollInterval = null;
+                showImagenProgress(100);
                 await displayImagenResult(data.imageData);
-                resolve();
+                setImagenLoading(false);
+                hideImagenProgress();
             } else if (data.status === 'error') {
+                clearInterval(state.pollInterval);
+                state.pollInterval = null;
                 showImagenStatus(`Generation failed: ${data.error || 'Unknown error'}`, 'error');
-                reject(new Error(data.error || 'Unknown error'));
+                setImagenLoading(false);
+                hideImagenProgress();
             } else {
-                let progress = 30;
-                if (data.status === 'processing') {
-                    progress = Math.min(40 + (attempts * 1), 85);
-                } else {
-                    progress = Math.min(30 + (attempts * 0.5), 70);
-                }
-                showImagenProgress(progress);
-                state.pollInterval = setTimeout(() => poll(resolve, reject), 5000);
+                // Continue polling
+                state.pollInterval = setTimeout(poll, 5000);
             }
         } catch (error) {
             console.error('Polling error:', error);
-            // Keep trying on polling error, but count towards max attempts
-            state.pollInterval = setTimeout(() => poll(resolve, reject), 5000);
+            // Don't stop polling on a single error, just try again next time.
+            // The maxAttempts check will eventually stop it.
+            state.pollInterval = setTimeout(poll, 5000);
         }
     };
 
-    return new Promise((resolve, reject) => {
-        // Clear any existing poll before starting a new one.
-        if (state.pollInterval) {
-            clearInterval(state.pollInterval);
-        }
-        state.pollInterval = setTimeout(() => poll(resolve, reject), 5000);
-    }).finally(() => {
-        if (state.pollInterval) {
-            clearInterval(state.pollInterval);
-            state.pollInterval = null;
-        }
-        setImagenLoading(false);
-        hideImagenProgress();
-    });
+    state.pollInterval = setTimeout(poll, 5000);
 }
+
 
 function updateImagenStatusMessage(status, attempts) {
     const elapsed = Math.floor(attempts * 5 / 60);
@@ -226,7 +235,6 @@ function displayImagenResult(base64Data) {
                     existingImage.src = preloader.src;
                     showImagenResult();
                     showImagenStatus('Image generated successfully!', 'success');
-                    setTimeout(hideImagenStatus, 4000);
                     resolve();
                 } catch (e) {
                     reject(e);
@@ -255,6 +263,7 @@ function hideImagenResult() {
 function hideImagenStatus() {
     if (ui.elements.status) {
         ui.elements.status.style.display = 'none';
+        ui.elements.status.textContent = '';
     }
 }
 
