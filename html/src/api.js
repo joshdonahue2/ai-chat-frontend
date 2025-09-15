@@ -88,7 +88,7 @@ export const api = {
 
     async generateImage(prompt) {
         const { data: { session } } = await supabase.auth.getSession();
-        const response = await fetch(config.imageUrl, {
+        const response = await fetch(`${config.callbackBaseUrl}/api/generate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ export const api = {
     },
 
     async getImageStatus(taskId) {
-        const response = await fetch(`${config.callbackBaseUrl}/status/${taskId}`);
+        const response = await fetch(`${config.callbackBaseUrl}/api/status/${taskId}`);
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
