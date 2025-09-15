@@ -67,7 +67,6 @@ const taskStore = new Map();
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
-app.use(express.static('public'));
 
 // Serve the frontend
 app.get('/', (req, res) => {

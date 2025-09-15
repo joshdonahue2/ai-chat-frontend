@@ -16,6 +16,9 @@ services:
       - .env
     networks:
       - ai-chat-network
+    depends_on:
+      imagen:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
