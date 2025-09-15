@@ -178,7 +178,7 @@ app.get('/api/status/:taskId', async (req, res) => {
 });
 
 // Webhook endpoint for n8n to send results back
-app.post('/api/webhook/result', upload.single('imageData'), (req, res) => {
+app.post('/api/webhook/result', upload.single('imageData'), async (req, res) => {
     try {
         // Data from the form fields comes from req.body
         const { taskId, success, error } = req.body;
