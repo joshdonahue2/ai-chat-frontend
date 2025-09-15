@@ -104,7 +104,7 @@ export const api = {
     },
 
     async getImageStatus(taskId) {
-        const response = await fetch(`${config.callbackBaseUrl}/status/${taskId}`);
+        const response = await fetch(`${config.callbackBaseUrl}/api/status/${taskId}`);
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }

@@ -239,8 +239,8 @@ app.post('/api/webhook/result', upload.single('imageData'), async (req, res) => 
                 ]);
 
             if (historyError && historyError.code !== '23505') { // Ignore duplicate key errors
-                console.error(`[${taskId}] Supabase insert error for history:`, historyError.message);
-            } else {
+                console.error(`[${taskId}] Supabase insert error for history:`, historyError);
+            } else if (!historyError) {
                 console.log(`[${taskId}] Image history saved to Supabase.`);
             }
 
